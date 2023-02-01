@@ -5,11 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace BusinessLayer.Models.Outbound
 {
-    public class BookingOutbound : BaseOutbound
+    public class BookingOutbound
     {
+        public Guid Id { get; set; }
+
         [Required]
         [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]

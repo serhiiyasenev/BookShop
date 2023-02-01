@@ -1,5 +1,7 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Outbound;
+using DataAccessLayer.DTO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,33 +24,34 @@ namespace Core1WebApi.Controllers
         }
 
         /// <summary>
-        /// Creates an a new Product
+        /// Creates a Product
         /// </summary>
+        /// <param name="product"></param>
+        /// <returns>A newly created Product item</returns>
         /// <remarks>
         /// Sample request:
-        ///     POST api/Product
+        ///
         ///     {
         ///     "name": "The Three Musketeers",
-        ///     "description": "You’ve likely heard of The Three Musketeers, or, Les Trois Mousquetaires even if you’re not a fan of French literature! This story has been reproduced into films, TV series, and other novels. This novel is considered to be the story that really put Dumas on the map.",
+        ///     "description": "You have likely heard of The Three Musketeers! This story has been reproduced into films, TV series, and other novels..." ,
         ///     "author": "Alexandre Dumas",
-        ///     "price": 12,
-        ///     "imageUrl": "ftp://ftp.book.shop/downloads/image.jpg"
+        ///     "price": 12.50,
+        ///     "imageUrl": "ftp://book.shop/downloads/image.jpg"
         ///     }
+        ///
         /// </remarks>
-        /// <param name="product"></param>
-        /// <returns>The endpoint returns newly created Product with Guid</returns>
         /// <response code="201">Returns the newly created item</response>
-        /// <response code="400">If the item is null</response>          
+        /// <response code="400">If the item is null</response>
         [HttpPost]
-        [ProducesResponseType(201)]
+        [ProducesResponseType(201, Type = typeof(ProductOutbound))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> AddProduct(ProductInbound product)
         {
             if (product != null)
             {
-                var createdProduct = await _productService.AddItem(product);
+                ProductOutbound createdProduct = await _productService.AddItem(product);
                 _logger.LogInformation($"Product was created with id: '{createdProduct.Id}'");
-                return Created(createdProduct.Id.ToString(), createdProduct);
+                return CreatedAtAction(nameof(AddProduct), createdProduct);
             }
 
             return BadRequest("Product should not be null or empty");

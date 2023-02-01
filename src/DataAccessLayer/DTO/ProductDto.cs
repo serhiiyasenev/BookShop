@@ -5,8 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataAccessLayer.DTO
 {
     [Table("Products")]
-    public class ProductDto : BaseEntity
+    public class ProductDto
     {
+        [Key]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(100, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 100 characters")]
         public string Name { get; set; }

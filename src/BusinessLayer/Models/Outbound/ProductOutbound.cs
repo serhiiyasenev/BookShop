@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BusinessLayer.Models.Outbound
 {
-    public class ProductOutbound : BaseOutbound
+    public class ProductOutbound
     {
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(100, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 100 characters")]
         public string Name { get; set; }
