@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace Core1WebApi.Controllers
+namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

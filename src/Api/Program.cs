@@ -1,8 +1,7 @@
-using Core1WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace WebApplication1
+namespace Api
 {
     public class Program
     {
