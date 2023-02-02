@@ -11,6 +11,7 @@ namespace BusinessLayer.Models.Outbound
 {
     public class BookingOutbound
     {
+        [Required]
         public Guid Id { get; set; }
 
         [Required]

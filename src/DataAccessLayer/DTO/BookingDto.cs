@@ -15,7 +15,7 @@ namespace DataAccessLayer.DTO
         [Required]
         [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
-        public ICollection<ProductDto> Products { get; set; }
+        public IEnumerable<ProductDto> Products { get; set; }
 
         [Required]
         [MinLength(10)]

@@ -6,6 +6,7 @@ namespace BusinessLayer.Models.Outbound
 {
     public class ProductOutbound
     {
+        [Required]
         public Guid Id { get; set; }
 
         [Required]
