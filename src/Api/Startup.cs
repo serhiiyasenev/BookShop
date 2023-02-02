@@ -15,6 +15,7 @@ using Microsoft.OpenApi.Models;
 using System.IO;
 using System;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace Api
 {
@@ -36,17 +37,19 @@ namespace Api
             services.AddScoped<IProductService<ProductInbound, ProductOutbound>, ProductService<ProductInbound, ProductOutbound>>();
             services.AddScoped<IBookingService<BookingInbound, BookingOutbound>, BookingService<BookingInbound, BookingOutbound>>();
 
-            services.AddDbContext<EfCoreContext>(options
-                => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddDbContext<EfCoreContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
             var assemblies = new[] { Assembly.GetAssembly(typeof(BookingProfile)) };
             services.AddAutoMapper(assemblies);
+
+            services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             services.AddControllers();
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "BookShop", Version = "v1" });
-
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });

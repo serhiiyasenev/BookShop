@@ -104,9 +104,9 @@ namespace Api.Controllers
         [HttpPatch("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
-        public async Task<IActionResult> UpdateProductById(Guid id, BookingStatus status)
+        public async Task<IActionResult> UpdateProductById(Guid id, BookingStatus bookingStatus)
         {
-            var updatedBooking = await _bookingService.UpdateItemStatusById(id, status);
+            var updatedBooking = await _bookingService.UpdateItemStatusById(id, bookingStatus);
             return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }
