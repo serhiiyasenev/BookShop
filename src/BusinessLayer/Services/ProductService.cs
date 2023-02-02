@@ -30,10 +30,10 @@ namespace BusinessLayer.Services
             return _mapper.Map<Outbound>(dbItem);
         }
 
-        public async Task<IEnumerable<Outbound>> GetAllItems()
+        public IQueryable<Outbound> GetAllItems()
         {
-            var dbItems = await _productRepository.GetAll().ToListAsync();
-            return _mapper.Map<IEnumerable<Outbound>>(dbItems);
+            var dbItems = _productRepository.GetAll();
+            return _mapper.ProjectTo<Outbound>(dbItems);
         }
 
         public async Task<Outbound> GetItemById(Guid id)

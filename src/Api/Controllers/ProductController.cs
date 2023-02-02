@@ -65,9 +65,9 @@ namespace Api.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IQueryable<ProductOutbound>))]
-        public async Task<IActionResult> GetAllProducts()
+        public IActionResult GetAllProducts()
         {
-            return Ok(await _productService.GetAllItemsAsync());
+            return Ok(_productService.GetAllItems());
         }
 
         /// <summary>

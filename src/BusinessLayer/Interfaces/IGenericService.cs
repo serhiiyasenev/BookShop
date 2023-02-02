@@ -12,7 +12,7 @@ namespace BusinessLayer.Interfaces
     {
         Task<Outbound> AddItem(Inbound item);
 
-        Task<IEnumerable<Outbound>> GetAllItems();
+        IQueryable<Outbound> GetAllItems();
 
         Task<Outbound> GetItemById(Guid id);
 
