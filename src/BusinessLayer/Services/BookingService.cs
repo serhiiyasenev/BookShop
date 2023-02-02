@@ -4,8 +4,10 @@ using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -28,10 +30,10 @@ namespace BusinessLayer.Services
             return _mapper.Map<Outbound>(dbItem);
         }
 
-        public async Task<IEnumerable<Outbound>> GetAllItems()
+        public IQueryable<Outbound> GetAllItems()
         {
-            var dbItems = await _bookingRepository.GetAll();
-            return _mapper.Map<IEnumerable<Outbound>>(dbItems);
+            var dbItems = _bookingRepository.GetAll();
+            return _mapper.ProjectTo<Outbound>(dbItems);
         }
 
         public async Task<Outbound> GetItemById(Guid id)

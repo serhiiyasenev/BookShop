@@ -3,9 +3,10 @@ using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace Core1WebApi.Controllers
+namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -22,36 +23,32 @@ namespace Core1WebApi.Controllers
         }
 
         /// <summary>
-        /// Creates an a new Product
+        /// Creates a Product
         /// </summary>
+        /// <param name="product"></param>
+        /// <returns>A newly created Product item</returns>
         /// <remarks>
         /// Sample request:
-        ///     POST api/Product
+        ///
         ///     {
         ///     "name": "The Three Musketeers",
-        ///     "description": "You’ve likely heard of The Three Musketeers, or, Les Trois Mousquetaires even if you’re not a fan of French literature! This story has been reproduced into films, TV series, and other novels. This novel is considered to be the story that really put Dumas on the map.",
+        ///     "description": "You have likely heard of The Three Musketeers! This story has been reproduced into films, TV series, and other novels..." ,
         ///     "author": "Alexandre Dumas",
-        ///     "price": 12,
-        ///     "imageUrl": "ftp://ftp.book.shop/downloads/image.jpg"
+        ///     "price": 12.50,
+        ///     "imageUrl": "ftp://book.shop/downloads/image.jpg"
         ///     }
+        ///
         /// </remarks>
-        /// <param name="product"></param>
-        /// <returns>The endpoint returns newly created Product with Guid</returns>
         /// <response code="201">Returns the newly created item</response>
-        /// <response code="400">If the item is null</response>          
+        /// <response code="400">If the item is incorrect</response>
         [HttpPost]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(201, Type = typeof(ProductOutbound))]
+        [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> AddProduct(ProductInbound product)
         {
-            if (product != null)
-            {
-                var createdProduct = await _productService.AddItem(product);
-                _logger.LogInformation($"Product was created with id: '{createdProduct.Id}'");
-                return Created(createdProduct.Id.ToString(), createdProduct);
-            }
-
-            return BadRequest("Product should not be null or empty");
+            var createdProduct = await _productService.AddItem(product);
+            _logger.LogInformation($"Product was created with id: '{createdProduct.Id}'");
+            return CreatedAtAction(nameof(AddProduct), createdProduct);
         }
 
         /// <summary>
@@ -61,9 +58,10 @@ namespace Core1WebApi.Controllers
         /// The endpoint returns all Products from a storage
         /// </remarks>
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        [ProducesResponseType(200, Type = typeof(IQueryable<ProductOutbound>))]
+        public IActionResult GetAllProducts()
         {
-            return Ok(await _productService.GetAllItems());
+            return Ok(_productService.GetAllItems());
         }
 
         /// <summary>
@@ -73,11 +71,12 @@ namespace Core1WebApi.Controllers
         /// The endpoint returns pointed by it's Guid Product from a storage
         /// </remarks>
         [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(ProductOutbound))]
+        [ProducesResponseType(404, Type = typeof(SimpleResult))]
         public async Task<IActionResult> GetProductById(Guid id)
         {
             var product = await _productService.GetItemById(id);
-
-            return product != null ? Ok(product) : NotFound($"NotFound by id: '{id}'");
+            return product != null ? Ok(product) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
 
         /// <summary>
@@ -87,11 +86,12 @@ namespace Core1WebApi.Controllers
         /// The endpoint returns newly updated Product by Guid
         /// </remarks>
         [HttpPut("{id}")]
+        [ProducesResponseType(200, Type = typeof(ProductOutbound))]
+        [ProducesResponseType(404, Type = typeof(SimpleResult))]
         public async Task<IActionResult> UpdateProductById(Guid id, ProductInbound product)
         {
             var updatedProduct = await _productService.UpdateItemById(id, product);
-
-            return updatedProduct != null ? Ok(updatedProduct) : NotFound($"NotFound by id: '{id}'");
+            return updatedProduct != null ? Ok(updatedProduct) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
 
         /// <summary>
@@ -101,11 +101,13 @@ namespace Core1WebApi.Controllers
         /// The endpoint returns pointed Guid
         /// </remarks>
         [HttpDelete("{id}")]
+        [ProducesResponseType(200, Type = typeof(SimpleResult))]
+        [ProducesResponseType(404, Type = typeof(SimpleResult))]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var result = await _productService.RemoveItemById(id);
-
-            return result > 0 ? Ok($"Product with id '{id}' was deleted") : NotFound($"NotFound by id: '{id}'");
+            return result > 0 ? Ok(new SimpleResult { Result = $"Product with id '{id}' was deleted" }) 
+                              : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }
 }

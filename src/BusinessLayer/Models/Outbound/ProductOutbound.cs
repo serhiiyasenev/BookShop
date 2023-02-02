@@ -1,15 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace BusinessLayer.Models.Outbound
 {
-    public class ProductOutbound : BaseOutbound
+    public class ProductOutbound
     {
+        [Required]
+        public Guid Id { get; set; }
+
         [Required]
         [StringLength(100, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 100 characters")]
         public string Name { get; set; }
 
-        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters")]
+        [StringLength(500, MinimumLength = 6, ErrorMessage = "Description must be between 6 and 500 characters")]
         public string Description { get; set; }
 
         [StringLength(50, MinimumLength = 5, ErrorMessage = "Author must be between 5 and 100 characters")]
@@ -22,7 +26,7 @@ namespace BusinessLayer.Models.Outbound
 
         [DataType(DataType.ImageUrl)]
         [Url(ErrorMessage = "Image URL must be a valid URL")]
-        [StringLength(1000, MinimumLength = 10, ErrorMessage = "URL Length must be between 10 and 1000 characters")]
+        [StringLength(1000, MinimumLength = 6, ErrorMessage = "URL Length must be between 6 and 1000 characters")]
         public string ImageUrl { get; set; }
     }
 }
