@@ -46,10 +46,13 @@ namespace Api
             services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            services.AddControllers();
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "BookShop", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "BookShop", Version = "v1",
+                    Description = "Use ISO date format 'yyyy-MM-dd'"
+                });
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });

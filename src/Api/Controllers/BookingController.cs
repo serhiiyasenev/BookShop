@@ -32,11 +32,18 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///     "name": "The Three Musketeers",
-        ///     "description": "You have likely heard of The Three Musketeers! This story has been reproduced into films, TV series, and other novels..." ,
-        ///     "author": "Alexandre Dumas",
-        ///     "price": 12.50,
-        ///     "imageUrl": "ftp://book.shop/downloads/image.jpg"
+        ///       "deliveryAddress": "string",
+        ///       "deliveryDate": "2023-02-03",
+        ///       "status": "Submitted",
+        ///       "products": [
+        ///         {
+        ///           "name": "string",
+        ///           "description": "string",
+        ///           "author": "string",
+        ///           "price": 12.59,
+        ///           "imageUrl": "string"
+        ///         }
+        ///       ]
         ///     }
         ///
         /// </remarks>
