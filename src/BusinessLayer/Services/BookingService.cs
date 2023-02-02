@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
+using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
-using DataAccessLayer.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,6 +43,13 @@ namespace BusinessLayer.Services
         public async Task<Outbound> UpdateItemById(Guid id, Inbound booking)
         {
             var dbItem = await _bookingRepository.UpdateById(id, _mapper.Map<BookingDto>(booking));
+            return _mapper.Map<Outbound>(dbItem);
+        }
+
+        public async Task<Outbound> UpdateItemStatusById(Guid id, BookingStatus status)
+        {
+            var test = (int)status;
+            var dbItem = await _bookingRepository.UpdateStatusById(id, (int)status);
             return _mapper.Map<Outbound>(dbItem);
         }
     }

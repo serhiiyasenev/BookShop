@@ -30,7 +30,7 @@ namespace BusinessLayer.Models.Outbound
             {
                 if (!DateOnly.TryParse(value.ToString(CultureInfo.InvariantCulture), out _deliveryDate))
                 {
-                    throw new ArgumentException($"Cannot parse BirthDate from `{value}`");
+                    throw new ArgumentException($"Cannot parse DeliveryDate from `{value}`");
                 }
                 if (_deliveryDate < CreatedDate)
                 {

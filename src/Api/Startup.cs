@@ -31,7 +31,10 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IProductRepository, ProductDbRepository>();
+            services.AddScoped<IBookingRepository, BookingDbRepository>();
+
             services.AddScoped<IProductService<ProductInbound, ProductOutbound>, ProductService<ProductInbound, ProductOutbound>>();
+            services.AddScoped<IBookingService<BookingInbound, BookingOutbound>, BookingService<BookingInbound, BookingOutbound>>();
 
             services.AddDbContext<EfCoreContext>(options
                 => options.UseSqlServer(Configuration.GetConnectionString("Default")));

@@ -2,7 +2,6 @@
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,6 +34,27 @@ namespace DataAccessLayer.Repositories
         public async Task<BookingDto> UpdateById(Guid id, BookingDto booking)
         {
             booking.Id = id;
+            dbContext.Attach(booking);
+            dbContext.Entry(booking).State = EntityState.Modified;
+            try
+            {
+                await dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return null;
+            }
+            return booking;
+        }
+
+        public async Task<BookingDto> UpdateStatusById(Guid id, int status)
+        {
+            var booking = await dbContext.Bookings.FindAsync(id);
+            if (booking == null)
+            {
+                return null;
+            }
+            booking.Status = status;
             dbContext.Attach(booking);
             dbContext.Entry(booking).State = EntityState.Modified;
             try
