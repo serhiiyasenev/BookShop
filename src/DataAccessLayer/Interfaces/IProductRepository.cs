@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -22,7 +23,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Products collection or empty collection
         /// </returns>
-        Task<IEnumerable<ProductDto>> GetAll();
+        public IQueryable<ProductDto> GetAll();
 
         /// <summary>
         /// Get Product by id

@@ -1,10 +1,10 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Outbound;
-using DataAccessLayer.DTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -64,9 +64,10 @@ namespace Api.Controllers
         /// The endpoint returns all Products from a storage
         /// </remarks>
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IQueryable<ProductOutbound>))]
         public async Task<IActionResult> GetAllProducts()
         {
-            return Ok(await _productService.GetAllItems());
+            return Ok(await _productService.GetAllItemsAsync());
         }
 
         /// <summary>
@@ -76,6 +77,7 @@ namespace Api.Controllers
         /// The endpoint returns pointed by it's Guid Product from a storage
         /// </remarks>
         [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(ProductOutbound))]
         public async Task<IActionResult> GetProductById(Guid id)
         {
             var product = await _productService.GetItemById(id);
@@ -104,6 +106,7 @@ namespace Api.Controllers
         /// The endpoint returns pointed Guid
         /// </remarks>
         [HttpDelete("{id}")]
+        //[ProducesResponseType(200, Type = typeof(ObjectResult))]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var result = await _productService.RemoveItemById(id);

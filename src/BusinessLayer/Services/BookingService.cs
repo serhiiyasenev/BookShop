@@ -4,8 +4,10 @@ using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -30,7 +32,7 @@ namespace BusinessLayer.Services
 
         public async Task<IEnumerable<Outbound>> GetAllItems()
         {
-            var dbItems = await _bookingRepository.GetAll();
+            var dbItems = await _bookingRepository.GetAll().ToListAsync();
             return _mapper.Map<IEnumerable<Outbound>>(dbItems);
         }
 

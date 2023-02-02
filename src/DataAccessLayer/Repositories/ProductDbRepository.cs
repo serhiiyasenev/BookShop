@@ -3,6 +3,7 @@ using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
@@ -24,10 +25,9 @@ namespace DataAccessLayer.Repositories
             return userEntity.Entity;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetAll()
+        public IQueryable<ProductDto> GetAll()
         {
-            var result = await _dbContext.Products.ToListAsync();
-            return result;
+           return _dbContext.Products.AsNoTracking();
         }
 
         public async Task<ProductDto> GetById(Guid id)

@@ -3,6 +3,7 @@ using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
@@ -21,10 +22,9 @@ namespace DataAccessLayer.Repositories
             return bookingEntity.Entity;
         }
 
-        public async Task<IEnumerable<BookingDto>> GetAll()
+        public IQueryable<BookingDto> GetAll()
         {
-            var result = await dbContext.Bookings.AsNoTracking().ToListAsync();
-            return result;
+            return dbContext.Bookings.AsNoTracking();
         }
 
         public async Task<BookingDto> GetById(Guid id)

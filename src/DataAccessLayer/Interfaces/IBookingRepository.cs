@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer.DTO;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -22,7 +23,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Bookings collection or empty collection
         /// </returns>
-        Task<IEnumerable<BookingDto>> GetAll();
+        IQueryable<BookingDto> GetAll();
 
         /// <summary>
         /// Get Booking by id
