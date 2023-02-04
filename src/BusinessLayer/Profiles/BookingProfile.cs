@@ -14,6 +14,7 @@ namespace BusinessLayer.Profiles
         {
             CreateMap<ProductInbound, ProductDto>()
                 .ForMember(dto => dto.Id, opt => opt.Ignore())
+                .ForMember(dto => dto.BookingDtoId, opt => opt.Ignore())
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(inb => inb.Name))
                 .ForMember(dto => dto.Description, opt => opt.MapFrom(inb => inb.Description))
                 .ForMember(dto => dto.Author, opt => opt.MapFrom(inb => inb.Author))
@@ -22,6 +23,7 @@ namespace BusinessLayer.Profiles
 
             CreateMap<ProductDto, ProductOutbound>()
                 .ForMember(outb => outb.Id, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(outb => outb.BookingId, opt => opt.MapFrom(dto => dto.BookingDtoId))
                 .ForMember(outb => outb.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(outb => outb.Description, opt => opt.MapFrom(dto => dto.Description))
                 .ForMember(outb => outb.Author, opt => opt.MapFrom(dto => dto.Author))
