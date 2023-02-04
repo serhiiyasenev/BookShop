@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Runtime.Serialization;
 
 namespace BusinessLayer.Models.Inbound.Booking
 {
