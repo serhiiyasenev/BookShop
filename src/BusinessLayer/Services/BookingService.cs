@@ -1,17 +1,21 @@
 ﻿using AutoMapper;
 using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Migrations;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
     public class BookingService<Inbound, Outbound>
-        : IBookingService<Inbound, Outbound> where Inbound : BookingInbound where Outbound : BookingOutbound
+        : IBookingService<Inbound, Outbound> where Inbound : BookingInboundWithProducts where Outbound : BookingOutbound
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IMapper _mapper;
@@ -25,6 +29,12 @@ namespace BusinessLayer.Services
         public async Task<Outbound> AddItem(Inbound booking)
         {
             var dbItem = await _bookingRepository.Add(_mapper.Map<BookingDto>(booking));
+            return _mapper.Map<Outbound>(dbItem);
+        }
+
+        public async Task<Outbound> AddItemWithExistingProducts(Inbound booking, IEnumerable<Guid> ids)
+        {
+            var dbItem = await _bookingRepository.AddWithExistingProducts(_mapper.Map<BookingDto>(booking), ids);
             return _mapper.Map<Outbound>(dbItem);
         }
 

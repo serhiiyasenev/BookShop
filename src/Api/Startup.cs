@@ -16,6 +16,8 @@ using System.IO;
 using System;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Booking;
 
 namespace Api
 {
@@ -35,7 +37,7 @@ namespace Api
             services.AddScoped<IBookingRepository, BookingDbRepository>();
 
             services.AddScoped<IProductService<ProductInbound, ProductOutbound>, ProductService<ProductInbound, ProductOutbound>>();
-            services.AddScoped<IBookingService<BookingInbound, BookingOutbound>, BookingService<BookingInbound, BookingOutbound>>();
+            services.AddScoped<IBookingService<BookingInboundWithProducts, BookingOutbound>, BookingService<BookingInboundWithProducts, BookingOutbound>>();
 
             services.AddDbContext<EfCoreContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));

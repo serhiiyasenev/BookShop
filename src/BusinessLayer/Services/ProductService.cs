@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
-using DataAccessLayer.Repositories;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

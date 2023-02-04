@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Runtime.Serialization;
 
 namespace BusinessLayer.Models.Outbound
 {
@@ -17,24 +15,8 @@ namespace BusinessLayer.Models.Outbound
         [MaxLength(100)]
         public string DeliveryAddress { get; set; }
 
-        private DateOnly _deliveryDate;
-
         [Required]
-        public DateOnly DeliveryDate
-        {
-            get => _deliveryDate;
-            set
-            {
-                if (!DateOnly.TryParse(value.ToString(CultureInfo.InvariantCulture), out _deliveryDate))
-                {
-                    throw new ArgumentException($"Cannot parse DeliveryDate from `{value}`");
-                }
-                if (_deliveryDate < CreatedDate)
-                {
-                    throw new ArgumentException($"`DeliveryDate {_deliveryDate}`cannot be before `{CreatedDate}`");
-                }
-            }
-        }
+        public DateOnly DeliveryDate { get; set; }
 
         public DateOnly CreatedDate { get; set; }
 

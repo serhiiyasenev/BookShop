@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using BusinessLayer.Enums;
+using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
+using System;
 
 namespace BusinessLayer.Profiles
 {
@@ -25,7 +28,7 @@ namespace BusinessLayer.Profiles
                 .ForMember(outb => outb.Price, opt => opt.MapFrom(dto => dto.Price))
                 .ForMember(outb => outb.ImageUrl, opt => opt.MapFrom(dto => dto.ImageUrl));
 
-            CreateMap<BookingInbound, BookingDto>()
+            CreateMap<BookingInboundWithProducts, BookingDto>()
                 .ForMember(dto => dto.Id, opt => opt.Ignore())
                 .ForMember(dto => dto.Products, opt => opt.MapFrom(inb => inb.Products))
                 .ForMember(dto => dto.DeliveryAddress, opt => opt.MapFrom(inb => inb.DeliveryAddress))

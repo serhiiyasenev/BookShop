@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
