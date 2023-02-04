@@ -23,7 +23,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Creates a Product
+        /// Create Product
         /// </summary>
         /// <param name="product"></param>
         /// <returns>A newly created Product item</returns>
