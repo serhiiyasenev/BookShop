@@ -1,8 +1,13 @@
-﻿using BusinessLayer.Interfaces;
+﻿using Api.Helpers;
+using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,12 +18,15 @@ namespace Api.Controllers
     [Produces("application/json")]
     public class ProductController : ControllerBase
     {
+        private readonly Settings _settings;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
 
-        public ProductController(ILogger<ProductController> logger, IProductService<ProductInbound, ProductOutbound> productService)
+        public ProductController(ILogger<ProductController> logger, IOptions<Settings> settings,
+            IProductService<ProductInbound, ProductOutbound> productService)
         {
             _logger = logger;
+            _settings = settings.Value;
             _productService = productService;
         }
 
@@ -49,6 +57,40 @@ namespace Api.Controllers
             var createdProduct = await _productService.AddItem(product);
             _logger.LogInformation($"Product was created with id: '{createdProduct.Id}'");
             return CreatedAtAction(nameof(AddProduct), createdProduct);
+        }
+
+        /// <summary>
+        /// Upload image file to local or cloud storage
+        /// </summary>
+        /// <param name="image"></param>
+        /// <response code="200">Returns successfully saved message</response>
+        /// <response code="400">If the item is incorrect</response>
+        /// <response code="500">If internal server error</response>
+        [HttpPost]
+        [Route("Image")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> AddProductImage(IFormFile image)
+        {
+            string fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant().Replace(".", "");
+            if (!_settings.AllowedExtensions.Split(";").ToList().Contains(fileExtension))
+            {
+                return BadRequest($"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`");
+            }
+
+            var imagePath = Path.Combine(_settings.StoragePath, image.FileName);
+            var (saved, message) = await _productService.SaveImage(imagePath, image.OpenReadStream());
+            if (saved)
+            {
+                _logger.LogInformation($"Image `{image.FileName}` saved to Image Storage `{_settings.StoragePath}`'");
+                return Ok($"Image `{image.FileName}` successfully saved to Image Storage");
+            }
+            else
+            {
+                _logger.LogInformation($"Image `{image.FileName}` cannot be saved to Image Storage `{_settings.StoragePath}` due to `{message}`'");
+                return StatusCode(500, $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}");
+            }
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,11 +12,6 @@ namespace DataAccessLayer.DTO
         public Guid Id { get; set; }
 
         [Required]
-        [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
-        [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
-        public IEnumerable<ProductDto> Products { get; set; }
-
-        [Required]
         [MinLength(10)]
         [MaxLength(100)]
         public string DeliveryAddress { get; set; }
@@ -28,5 +22,10 @@ namespace DataAccessLayer.DTO
         public DateOnly DeliveryDate { get; set; }
 
         public int Status { get; set; }
+
+        [Required]
+        [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
+        [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
+        public IEnumerable<ProductDto> Products { get; set; }
     }
 }

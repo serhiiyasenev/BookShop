@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Runtime.Serialization;
 
-namespace BusinessLayer.Models.Outbound
+namespace BusinessLayer.Models.Inbound.Booking
 {
-    public class BookingInbound
+    public abstract class BookingInboundBase<T>
     {
         [Required]
         [MinLength(6)]
@@ -43,6 +42,6 @@ namespace BusinessLayer.Models.Outbound
         [Required]
         [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
-        public IEnumerable<ProductInbound> Products { get; set; }
+        public abstract IEnumerable<T> Products { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLayer.Enums;
+using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 
@@ -11,6 +13,7 @@ namespace BusinessLayer.Profiles
         {
             CreateMap<ProductInbound, ProductDto>()
                 .ForMember(dto => dto.Id, opt => opt.Ignore())
+                .ForMember(dto => dto.BookingDtoId, opt => opt.Ignore())
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(inb => inb.Name))
                 .ForMember(dto => dto.Description, opt => opt.MapFrom(inb => inb.Description))
                 .ForMember(dto => dto.Author, opt => opt.MapFrom(inb => inb.Author))
@@ -19,13 +22,14 @@ namespace BusinessLayer.Profiles
 
             CreateMap<ProductDto, ProductOutbound>()
                 .ForMember(outb => outb.Id, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(outb => outb.BookingId, opt => opt.MapFrom(dto => dto.BookingDtoId))
                 .ForMember(outb => outb.Name, opt => opt.MapFrom(dto => dto.Name))
                 .ForMember(outb => outb.Description, opt => opt.MapFrom(dto => dto.Description))
                 .ForMember(outb => outb.Author, opt => opt.MapFrom(dto => dto.Author))
                 .ForMember(outb => outb.Price, opt => opt.MapFrom(dto => dto.Price))
                 .ForMember(outb => outb.ImageUrl, opt => opt.MapFrom(dto => dto.ImageUrl));
 
-            CreateMap<BookingInbound, BookingDto>()
+            CreateMap<BookingInboundWithProducts, BookingDto>()
                 .ForMember(dto => dto.Id, opt => opt.Ignore())
                 .ForMember(dto => dto.Products, opt => opt.MapFrom(inb => inb.Products))
                 .ForMember(dto => dto.DeliveryAddress, opt => opt.MapFrom(inb => inb.DeliveryAddress))

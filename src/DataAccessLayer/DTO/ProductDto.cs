@@ -29,5 +29,8 @@ namespace DataAccessLayer.DTO
         [Url(ErrorMessage = "Image URL must be a valid URL")]
         [StringLength(1000, MinimumLength = 10, ErrorMessage = "URL Length must be between 10 and 100 characters")]
         public string ImageUrl { get; set; }
+
+        [ForeignKey("BookingDto")]
+        public Guid? BookingDtoId { get; set; }
     }
 }

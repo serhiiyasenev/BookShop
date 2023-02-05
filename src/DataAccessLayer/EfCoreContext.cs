@@ -1,9 +1,9 @@
 ﻿using DataAccessLayer.DTO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Configuration;
 using System;
-using System.ComponentModel;
+using System.IO;
 
 namespace DataAccessLayer
 {
@@ -17,9 +17,12 @@ namespace DataAccessLayer
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // temp solution
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Default");
+                var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.Development.json").Build();
+                var connectionString = config.GetSection("ConnectionStrings").GetValue<string>("Default");
+                optionsBuilder.UseSqlServer(connectionString);
             }
         }
 

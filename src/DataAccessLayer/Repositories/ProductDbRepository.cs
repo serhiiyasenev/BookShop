@@ -19,9 +19,9 @@ namespace DataAccessLayer.Repositories
         public async Task<ProductDto> Add(ProductDto product)
         {
             product.Id = Guid.NewGuid();
-            var userEntity = await _dbContext.Products.AddAsync(product);
+            var productEntity = await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
-            return userEntity.Entity;
+            return productEntity.Entity;
         }
 
         public IQueryable<ProductDto> GetAll()
@@ -34,11 +34,11 @@ namespace DataAccessLayer.Repositories
             return await _dbContext.Products.FindAsync(id);
         }
 
-        public async Task<ProductDto> UpdateById(Guid id, ProductDto user)
+        public async Task<ProductDto> UpdateById(Guid id, ProductDto product)
         {
-            user.Id = id;
-            _dbContext.Attach(user);
-            _dbContext.Entry(user).State = EntityState.Modified;
+            product.Id = id;
+            _dbContext.Attach(product);
+            _dbContext.Entry(product).State = EntityState.Modified;
             try
             {
                 await _dbContext.SaveChangesAsync();
@@ -47,7 +47,7 @@ namespace DataAccessLayer.Repositories
             {
                 return null;
             }
-            return user;
+            return product;
         }
 
         public async Task<int> RemoveItemById(Guid id)

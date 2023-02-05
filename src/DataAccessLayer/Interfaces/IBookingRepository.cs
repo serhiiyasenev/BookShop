@@ -18,6 +18,15 @@ namespace DataAccessLayer.Interfaces
         Task<BookingDto> Add(BookingDto booking);
 
         /// <summary>
+        /// Add Booking with existing Products
+        /// </summary>
+        /// <param name="booking"></param>
+        /// <returns>
+        /// Newly created Booking
+        /// </returns>
+        Task<BookingDto> AddWithExistingProducts(BookingDto booking, IEnumerable<Guid> ids);
+
+        /// <summary>
         /// Get all Bookings
         /// </summary>
         /// <returns>
