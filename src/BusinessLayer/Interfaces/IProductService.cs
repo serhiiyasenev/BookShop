@@ -1,6 +1,5 @@
-﻿using BusinessLayer.Models.Outbound;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Interfaces
@@ -9,5 +8,7 @@ namespace BusinessLayer.Interfaces
         : IGenericService<Inbound, Outbound> where Inbound : class where Outbound : class
     {
         Task<int> RemoveItemById(Guid id);
+
+        Task<(bool, string)> SaveImage(string path, Stream image);
     }
 }

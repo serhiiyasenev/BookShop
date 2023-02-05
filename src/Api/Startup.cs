@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Inbound.Booking;
+using Api.Helpers;
 
 namespace Api
 {
@@ -41,6 +42,8 @@ namespace Api
 
             services.AddDbContext<EfCoreContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
+
+            services.Configure<Settings>(Configuration.GetSection("Settings"));
 
             var assemblies = new[] { Assembly.GetAssembly(typeof(BookingProfile)) };
             services.AddAutoMapper(assemblies);

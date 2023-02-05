@@ -1,41 +1,29 @@
 ﻿using DataAccessLayer.DTO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
-using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols;
 using System;
-using System.ComponentModel;
-using System.Linq;
+using System.IO;
 
 namespace DataAccessLayer
 {
     public class EfCoreContext : DbContext
     {
-        private readonly string _connectionString;
-
         public DbSet<BookingDto> Bookings { get; set; }
         public DbSet<ProductDto> Products { get; set; }
 
         public EfCoreContext() { }
-        public EfCoreContext(DbContextOptions<EfCoreContext> options) : base(options)
-        {
-            _connectionString = ((SqlServerOptionsExtension)options.Extensions.Last()).ConnectionString;
-        }
+        public EfCoreContext(DbContextOptions<EfCoreContext> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // temp solution
-            optionsBuilder.UseSqlServer("Server=localhost;Database=BookShopTest;Trusted_Connection=True;MultipleActiveResultSets=True;TrustServerCertificate=True");
-
-            //if (!optionsBuilder.IsConfigured)
-            //{
-            //    optionsBuilder.UseSqlServer(_connectionString);
-            //}
+            if (!optionsBuilder.IsConfigured)
+            {
+                var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+                var connectionString = config.GetSection("ConnectionStrings").GetValue<string>("Default");
+                optionsBuilder.UseSqlServer(connectionString);
+            }
         }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder builder)

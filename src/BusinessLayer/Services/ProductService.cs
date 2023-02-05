@@ -5,6 +5,7 @@ using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,6 +50,23 @@ namespace BusinessLayer.Services
         public async Task<int> RemoveItemById(Guid id)
         {
             return await _productRepository.RemoveItemById(id);
+        }
+
+        public async Task<(bool, string)> SaveImage(string path, Stream image)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                return (true, "Saved successfully");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
         }
     }
 }
