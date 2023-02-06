@@ -10,7 +10,7 @@ namespace BusinessLayer.Models.Inbound
         [Range(1, 100)]
         public int PageSize { get; set; } = 10;
 
-        [Range(1, 100)]
+        [Range(1, 10000)]
         public int Page { get; set;} = 1;
     }
 }
