@@ -19,15 +19,17 @@ namespace Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly Settings _settings;
+        private readonly HttpContext _httpContext;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
 
         public ProductController(ILogger<ProductController> logger, IOptions<Settings> settings,
-            IProductService<ProductInbound, ProductOutbound> productService)
+            IProductService<ProductInbound, ProductOutbound> productService, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _settings = settings.Value;
             _productService = productService;
+            _httpContext = contextAccessor.HttpContext;
         }
 
         /// <summary>
@@ -101,8 +103,11 @@ namespace Api.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
-        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts()
+        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts([FromQuery] GetItemsRequest request)
         {
+            var requestTest = request;
+            var contextTest = _httpContext;
+            // it will be updated to get via predicates From Query string and Context
             var products = _productService.GetAllItems();
             var result = new ResponseModel<ProductOutbound>
             {

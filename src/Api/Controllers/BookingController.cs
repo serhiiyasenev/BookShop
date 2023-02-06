@@ -3,6 +3,7 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,17 +17,19 @@ namespace Api.Controllers
     [Produces("application/json")]
     public class BookingController : ControllerBase
     {
+        private readonly HttpContext _httpContext;
         private readonly ILogger<BookingController> _logger;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
         private readonly IBookingService<BookingInboundWithProducts, BookingOutbound> _bookingService;
 
-        public BookingController(ILogger<BookingController> logger, 
+        public BookingController(ILogger<BookingController> logger, IHttpContextAccessor contextAccessor,
             IBookingService<BookingInboundWithProducts, BookingOutbound> bookingService, 
             IProductService<ProductInbound, ProductOutbound> productService)
         {
             _logger = logger;
             _productService = productService;
             _bookingService = bookingService;
+            _httpContext = contextAccessor.HttpContext;
         }
 
         /// <summary>
@@ -121,10 +124,19 @@ namespace Api.Controllers
         /// The endpoint returns all Bookings from a storage
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IQueryable<BookingOutbound>))]
-        public IActionResult GetAllBookings()
+        [ProducesResponseType(200, Type = typeof(ResponseModel<BookingOutbound>))]
+        public ActionResult<ResponseModel<BookingOutbound>> GetAllProducts([FromQuery] GetItemsRequest request)
         {
-            return Ok(_bookingService.GetAllItems());
+            var tequestTest = request;
+            var contextTest = _httpContext;
+            // it will be updated to get via predicates From Query string and Context
+            var bookings = _bookingService.GetAllItems();
+            var result = new ResponseModel<BookingOutbound>()
+            {
+                Items = bookings,   
+                TotalCount = bookings.Count()
+            };
+            return Ok(result);
         }
 
         /// <summary>

@@ -34,6 +34,9 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging();
+            services.AddHttpContextAccessor();
+
             services.AddScoped<IProductRepository, ProductDbRepository>();
             services.AddScoped<IBookingRepository, BookingDbRepository>();
 
@@ -45,8 +48,7 @@ namespace Api
 
             services.Configure<Settings>(Configuration.GetSection("Settings"));
 
-            var assemblies = new[] { Assembly.GetAssembly(typeof(BookingProfile)) };
-            services.AddAutoMapper(assemblies);
+            services.AddAutoMapper(new[] { Assembly.GetAssembly(typeof(BookingProfile)) });
 
             services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -75,6 +77,8 @@ namespace Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
