@@ -68,15 +68,15 @@ namespace Api.Controllers
         /// <response code="500">If internal server error</response>
         [HttpPost]
         [Route("Image")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(200, Type = typeof(SimpleResult))]
+        [ProducesResponseType(400, Type = typeof(SimpleResult))]
+        [ProducesResponseType(500, Type = typeof(SimpleResult))]
         public async Task<IActionResult> AddProductImage(IFormFile image)
         {
             string fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant().Replace(".", "");
             if (!_settings.AllowedExtensions.Split(";").ToList().Contains(fileExtension))
             {
-                return BadRequest($"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`");
+                return BadRequest(new SimpleResult { Result = $"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`" });
             }
 
             var imagePath = Path.Combine(_settings.StoragePath, image.FileName);
@@ -84,12 +84,12 @@ namespace Api.Controllers
             if (saved)
             {
                 _logger.LogInformation($"Image `{image.FileName}` saved to Image Storage `{_settings.StoragePath}`'");
-                return Ok($"Image `{image.FileName}` successfully saved to Image Storage");
+                return Ok(new SimpleResult { Result = $"Image `{image.FileName}` successfully saved to Image Storage" });
             }
             else
             {
                 _logger.LogInformation($"Image `{image.FileName}` cannot be saved to Image Storage `{_settings.StoragePath}` due to `{message}`'");
-                return StatusCode(500, $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}");
+                return StatusCode(500, new SimpleResult { Result = $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}" });
             }
         }
 
@@ -100,10 +100,16 @@ namespace Api.Controllers
         /// The endpoint returns all Products from a storage
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IQueryable<ProductOutbound>))]
-        public IActionResult GetAllProducts()
+        [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
+        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts()
         {
-            return Ok(_productService.GetAllItems());
+            var products = _productService.GetAllItems();
+            var result = new ResponseModel<ProductOutbound>
+            {
+                Items = products,
+                TotalCount = products.Count()
+            };
+            return Ok(result);
         }
 
         /// <summary>

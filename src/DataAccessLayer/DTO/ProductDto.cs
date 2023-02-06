@@ -8,6 +8,7 @@ namespace DataAccessLayer.DTO
     public class ProductDto
     {
         [Key]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]
