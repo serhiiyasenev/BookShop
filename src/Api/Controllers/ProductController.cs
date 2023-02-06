@@ -1,6 +1,7 @@
 ﻿using Api.Helpers;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BusinessLayer.Models.Inbound.Product;
+using System.Collections.Generic;
 
 namespace BusinessLayer.Models.Inbound.Booking
 {

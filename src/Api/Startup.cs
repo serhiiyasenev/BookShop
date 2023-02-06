@@ -1,3 +1,4 @@
+using Api.Helpers;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Outbound;
 using BusinessLayer.Profiles;
@@ -16,9 +17,8 @@ using System.IO;
 using System;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Inbound.Booking;
-using Api.Helpers;
 
 namespace Api
 {
