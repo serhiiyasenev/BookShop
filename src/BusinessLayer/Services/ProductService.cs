@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLayer.Interfaces;
-using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;

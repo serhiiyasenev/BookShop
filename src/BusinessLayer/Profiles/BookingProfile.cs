@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLayer.Enums;
-using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;

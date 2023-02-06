@@ -1,6 +1,7 @@
 ﻿using Api.Helpers;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,17 @@ namespace Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly Settings _settings;
+        private readonly HttpContext _httpContext;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
 
         public ProductController(ILogger<ProductController> logger, IOptions<Settings> settings,
-            IProductService<ProductInbound, ProductOutbound> productService)
+            IProductService<ProductInbound, ProductOutbound> productService, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _settings = settings.Value;
             _productService = productService;
+            _httpContext = contextAccessor.HttpContext;
         }
 
         /// <summary>
@@ -68,15 +71,15 @@ namespace Api.Controllers
         /// <response code="500">If internal server error</response>
         [HttpPost]
         [Route("Image")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(200, Type = typeof(SimpleResult))]
+        [ProducesResponseType(400, Type = typeof(SimpleResult))]
+        [ProducesResponseType(500, Type = typeof(SimpleResult))]
         public async Task<IActionResult> AddProductImage(IFormFile image)
         {
             string fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant().Replace(".", "");
             if (!_settings.AllowedExtensions.Split(";").ToList().Contains(fileExtension))
             {
-                return BadRequest($"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`");
+                return BadRequest(new SimpleResult { Result = $"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`" });
             }
 
             var imagePath = Path.Combine(_settings.StoragePath, image.FileName);
@@ -84,12 +87,12 @@ namespace Api.Controllers
             if (saved)
             {
                 _logger.LogInformation($"Image `{image.FileName}` saved to Image Storage `{_settings.StoragePath}`'");
-                return Ok($"Image `{image.FileName}` successfully saved to Image Storage");
+                return Ok(new SimpleResult { Result = $"Image `{image.FileName}` successfully saved to Image Storage" });
             }
             else
             {
                 _logger.LogInformation($"Image `{image.FileName}` cannot be saved to Image Storage `{_settings.StoragePath}` due to `{message}`'");
-                return StatusCode(500, $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}");
+                return StatusCode(500, new SimpleResult { Result = $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}" });
             }
         }
 
@@ -100,10 +103,19 @@ namespace Api.Controllers
         /// The endpoint returns all Products from a storage
         /// </remarks>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IQueryable<ProductOutbound>))]
-        public IActionResult GetAllProducts()
+        [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
+        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts([FromQuery] GetItemsRequest request)
         {
-            return Ok(_productService.GetAllItems());
+            var requestTest = request;
+            var contextTest = _httpContext;
+            // it will be updated to get results via predicates From Query string and Context
+            var products = _productService.GetAllItems();
+            var result = new ResponseModel<ProductOutbound>
+            {
+                Items = products,
+                TotalCount = products.Count()
+            };
+            return Ok(result);
         }
 
         /// <summary>

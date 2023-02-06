@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusinessLayer.Models.Inbound
+namespace BusinessLayer.Models.Inbound.Product
 {
     public class ProductInbound
     {

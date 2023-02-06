@@ -6,7 +6,6 @@ using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
-using DataAccessLayer.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
