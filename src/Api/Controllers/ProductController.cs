@@ -108,7 +108,7 @@ namespace Api.Controllers
         {
             var requestTest = request;
             var contextTest = _httpContext;
-            // it will be updated to get via predicates From Query string and Context
+            // it will be updated to get results via predicates From Query string and Context
             var products = _productService.GetAllItems();
             var result = new ResponseModel<ProductOutbound>
             {

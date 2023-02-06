@@ -9,7 +9,7 @@ namespace DataAccessLayer.DTO
     public class BookingDto
     {
         [Key]
-        ////[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]

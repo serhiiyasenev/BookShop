@@ -130,7 +130,7 @@ namespace Api.Controllers
         {
             var tequestTest = request;
             var contextTest = _httpContext;
-            // it will be updated to get via predicates From Query string and Context
+            // it will be updated to get results via predicates From Query string and Context
             var bookings = _bookingService.GetAllItems();
             var result = new ResponseModel<BookingOutbound>()
             {
