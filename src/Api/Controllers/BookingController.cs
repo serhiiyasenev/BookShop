@@ -101,7 +101,7 @@ namespace Api.Controllers
             {
                 if (await _productService.GetItemById(id) == null)
                 {
-                    NotFound(new SimpleResult { Result = $"NotFound by Product id: '{id}'" });
+                    return NotFound(new SimpleResult { Result = $"NotFound by Product id: '{id}'" });
                 }
             }
 
