@@ -11,6 +11,8 @@ namespace BusinessLayer.Models.Outbound
 
         public string DeliveryAddress { get; set; }
 
+        public string CustomerEmail { get; set; }
+
         public DateOnly DeliveryDate { get; set; }
 
         public DateTime CreatedDate { get; set; }

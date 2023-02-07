@@ -44,6 +44,7 @@ namespace Api.Controllers
         ///     {
         ///       "deliveryAddress": "deliveryAddress 1234",
         ///       "deliveryDate": "2023-12-03",
+        ///       "customerEmail": "user@example.com",
         ///       "products": [
         ///         {
         ///           "name": "name Test",

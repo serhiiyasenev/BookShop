@@ -18,6 +18,10 @@ namespace DataAccessLayer.DTO
         public string DeliveryAddress { get; set; }
 
         [Required]
+        [EmailAddress]
+        public string CustomerEmail { get; set; }
+
+        [Required]
         public DateTime CreatedDate { get; set; }
 
         [Required]

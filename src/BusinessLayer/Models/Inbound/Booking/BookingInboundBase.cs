@@ -14,6 +14,10 @@ namespace BusinessLayer.Models.Inbound.Booking
         [MaxLength(100)]
         public string DeliveryAddress { get; set; }
 
+        [Required]
+        [EmailAddress]
+        public string CustomerEmail { get; set; }
+
         [ReadOnly(true)]
         internal DateTime CreatedDate => DateTime.UtcNow;
 
