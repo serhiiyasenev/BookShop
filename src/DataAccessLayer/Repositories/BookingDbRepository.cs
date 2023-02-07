@@ -2,6 +2,7 @@
 using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,9 +45,26 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> UpdateById(Guid id, BookingDto booking)
         {
-            booking.Id = id;
-            _dbContext.Attach(booking);
-            _dbContext.Entry(booking).State = EntityState.Modified;
+            var bookingDb = await _dbContext.Bookings.AsNoTracking()
+                .Include(p => p.Products).FirstOrDefaultAsync(b => b.Id.Equals(id));
+
+            if (bookingDb == null)
+            {
+                return null;
+            }
+
+            if (booking.Products.Count() > 0)
+            {
+                var dbProducts = bookingDb.Products.ToList();
+                dbProducts.AddRange(booking.Products);
+                bookingDb.Products = dbProducts;
+            }
+
+            bookingDb.DeliveryDate = booking.DeliveryDate;
+            bookingDb.DeliveryAddress = booking.DeliveryAddress;
+
+            _dbContext.Attach(bookingDb);
+            _dbContext.Entry(bookingDb).State = EntityState.Modified;
             try
             {
                 await _dbContext.SaveChangesAsync();
@@ -55,12 +73,12 @@ namespace DataAccessLayer.Repositories
             {
                 return null;
             }
-            return booking;
+            return bookingDb;
         }
 
         public async Task<BookingDto> UpdateStatusById(Guid id, int status)
         {
-            var booking = await _dbContext.Bookings.FindAsync(id);
+            var booking = await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).FirstOrDefaultAsync(b => b.Id.Equals(id));
             if (booking == null)
             {
                 return null;

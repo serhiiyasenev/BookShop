@@ -18,7 +18,8 @@ namespace BusinessLayer.Models.Outbound
         [Required]
         public DateOnly DeliveryDate { get; set; }
 
-        public DateOnly CreatedDate { get; set; }
+        [Required]
+        public DateTime CreatedDate { get; set; }
 
         [EnumDataType(typeof(BookingStatus))]
         public BookingStatus Status { get; set; }

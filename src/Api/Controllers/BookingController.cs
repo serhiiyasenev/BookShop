@@ -42,16 +42,15 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///       "deliveryAddress": "string",
+        ///       "deliveryAddress": "deliveryAddress 1234",
         ///       "deliveryDate": "2023-12-03",
-        ///       "status": "Submitted",
         ///       "products": [
         ///         {
-        ///           "name": "string",
-        ///           "description": "string",
-        ///           "author": "string",
-        ///           "price": 12.59,
-        ///           "imageUrl": "string"
+        ///           "name": "name Test",
+        ///           "description": "description Test",
+        ///           "author": "author Test",
+        ///           "price": 12.34,
+        ///           "imageUrl": "ftp://book.shop/downloads/image.jpg"
         ///         }
         ///       ]
         ///     }
@@ -80,7 +79,6 @@ namespace Api.Controllers
         ///     {
         ///       "deliveryAddress": "string",
         ///       "deliveryDate": "2023-12-03",
-        ///       "status": "Submitted",
         ///       "products": [
         ///         "Guid-1",
         ///         "Guid-2",
@@ -110,9 +108,9 @@ namespace Api.Controllers
             var booking = new BookingInboundWithProducts
             {
                 DeliveryAddress = bookingWithIds.DeliveryAddress,
-                DeliveryDate = bookingWithIds.DeliveryDate,
-                Status = bookingWithIds.Status
+                DeliveryDate = bookingWithIds.DeliveryDate
             };
+
             var createdbooking = await _bookingService.AddItemWithExistingProducts(booking, bookingWithIds.Products);
             _logger.LogInformation($"Booking was created with id: '{createdbooking.Id}'");
             return CreatedAtAction(nameof(AddBooking), createdbooking);
@@ -159,7 +157,9 @@ namespace Api.Controllers
         /// Update Booking by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns newly updated Booking
+        /// The endpoint returns newly updated Booking <br/>
+        /// It will add new producs if you specified them in producs array <br/>
+        /// <b> If you need just update Booking without adding new products, skip `products []` here</b>
         /// </remarks>
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
@@ -179,7 +179,7 @@ namespace Api.Controllers
         [HttpPatch("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
-        public async Task<IActionResult> UpdateProductById(Guid id, BookingStatus bookingStatus)
+        public async Task<IActionResult> UpdateBookingStatusById(Guid id, BookingStatus bookingStatus)
         {
             var updatedBooking = await _bookingService.UpdateItemStatusById(id, bookingStatus);
             return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
