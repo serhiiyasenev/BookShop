@@ -15,7 +15,7 @@ namespace BusinessLayer.Models.Inbound.Booking
         public string DeliveryAddress { get; set; }
 
         [ReadOnly(true)]
-        public DateTime CreatedDate => DateTime.UtcNow;
+        internal DateTime CreatedDate => DateTime.UtcNow;
 
         [ReadOnly(true)]
         internal BookingStatus Status => BookingStatus.Submitted;
