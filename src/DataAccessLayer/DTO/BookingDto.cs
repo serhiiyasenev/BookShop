@@ -17,7 +17,8 @@ namespace DataAccessLayer.DTO
         [MaxLength(100)]
         public string DeliveryAddress { get; set; }
 
-        public DateOnly CreatedDate { get; set; }
+        [Required]
+        public DateTime CreatedDate { get; set; }
 
         [Required]
         public DateOnly DeliveryDate { get; set; }

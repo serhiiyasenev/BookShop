@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(EfCoreContext))]
-    [Migration("20230204023924_Undo_20230204012528_ForeignKey")]
-    partial class Undo20230204012528ForeignKey
+    [Migration("20230207145218_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,7 +32,7 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DeliveryAddress")
                         .IsRequired()
@@ -60,7 +60,7 @@ namespace DataAccessLayer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("BookingDtoId")
+                    b.Property<Guid?>("BookingDtoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -90,9 +90,7 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("DataAccessLayer.DTO.BookingDto", null)
                         .WithMany("Products")
-                        .HasForeignKey("BookingDtoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BookingDtoId");
                 });
 
             modelBuilder.Entity("DataAccessLayer.DTO.BookingDto", b =>

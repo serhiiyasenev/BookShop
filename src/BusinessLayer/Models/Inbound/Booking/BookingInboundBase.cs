@@ -14,6 +14,12 @@ namespace BusinessLayer.Models.Inbound.Booking
         [MaxLength(100)]
         public string DeliveryAddress { get; set; }
 
+        [ReadOnly(true)]
+        internal DateTime CreatedDate => DateTime.UtcNow;
+
+        [ReadOnly(true)]
+        internal BookingStatus Status => BookingStatus.Submitted;
+
         private DateOnly _deliveryDate;
 
         [Required]
@@ -26,21 +32,13 @@ namespace BusinessLayer.Models.Inbound.Booking
                 {
                     throw new ArgumentException($"Cannot parse DeliveryDate from `{value}`");
                 }
-                if (_deliveryDate < CreatedDate)
+                if (_deliveryDate < DateOnly.FromDateTime(CreatedDate))
                 {
                     throw new ArgumentException($"`DeliveryDate {_deliveryDate}`cannot be before `{CreatedDate}`");
                 }
             }
         }
 
-        [ReadOnly(true)]
-        public DateOnly CreatedDate => DateOnly.FromDateTime(DateTime.UtcNow);
-
-        [EnumDataType(typeof(BookingStatus))]
-        public BookingStatus Status { get; set; }
-
-        [Required]
-        [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
         public abstract IEnumerable<T> Products { get; set; }
     }

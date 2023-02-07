@@ -58,7 +58,9 @@ namespace Api
                 options.SwaggerDoc("v1", new OpenApiInfo 
                 { 
                     Title = "BookShop", Version = "v1",
-                    Description = "Use ISO date format 'yyyy-MM-dd'"
+                    Description = "Use ISO 8601 datetime format (TimeZone is UTC): <br/>" +
+                    "1. DateOnly as yyyy-MM-dd ('2023-01-31')<br/> " +
+                    "2. DateTime as yyyy-MM-ddThh:mm:ss.SSSZ ('2023-01-31T20:56:38.663Z')"
                 });
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
