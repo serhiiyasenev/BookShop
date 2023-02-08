@@ -28,11 +28,10 @@ namespace BusinessLayer.Models.Outbound
             var products = $"{ string.Join("<br>", Products.Select(e => e.ToString())) }";
 
             return $"1. Delivery Address: <b> {DeliveryAddress} </b> <br>" +
-                   $"2. Customer Email: {CustomerEmail} <br>" +
-                   $"3. Delivery Date: <b> {DeliveryDate:dd-MMMM-yyyy} </b> <br>" +
-                   $"4. Created Date: {CreatedDate:dd-MMMM-yyyy} <br>" +
-                   $"5. Booking Status: {Status} <br>" +
-                   $"6. Products: <br> {products}";
+                   $"2. Delivery Date: <b> {DeliveryDate:dd-MMMM-yyyy} </b> <br>" +
+                   $"3. Created Date: {CreatedDate:dd-MMMM-yyyy} <br>" +
+                   $"4. Booking Status: {Status} <br>" +
+                   $"5. Products: <br> {products}";
         }
     }
 }

@@ -21,7 +21,7 @@ namespace BusinessLayer.Models.Outbound
 
         public override string ToString()
         {
-            return $"{Name}, author: {Author}, price: {Price};";
+            return $"- {Name}, author: {Author}, price: {Price};";
         }
     }
 }

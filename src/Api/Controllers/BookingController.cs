@@ -48,7 +48,7 @@ namespace Api.Controllers
         ///     {
         ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
         ///       "deliveryDate": "2023-04-03",
-        ///       "customerEmail": "serhii.yasenev+1@gmail.com",
+        ///       "customerEmail": "email.test+1@gmail.com",
         ///       "products": [
         ///         {
         ///           "name": "MSDN Edition 1",
@@ -80,7 +80,7 @@ namespace Api.Controllers
             _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
 
             await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
-                $"<center> Congratulations! </center> <br> Your booking is: <br> <br> {createdBooking}");
+                $"<b> Congratulations! </b> <br> <br> Your booking is: <br> <br> {createdBooking}");
 
             _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
 

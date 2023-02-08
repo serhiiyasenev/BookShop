@@ -11,12 +11,14 @@ namespace InfrastructureLayer.Email.SendGrid
     public class SendGridEmailSender : IEmailSender
     {
         private readonly string _emailFrom;
+        private readonly string _nameFrom;
         private readonly SendGridSettings _options;
         private readonly SendGridClient _client;
 
         public SendGridEmailSender(IOptions<SendGridSettings> options)
         {
             _options = options.Value;
+            _nameFrom = _options.SenderNameFrom;
             _emailFrom = Environment.GetEnvironmentVariable(_options.SenderEmailFromKey);
             _client = new SendGridClient(Environment.GetEnvironmentVariable(_options.ApiKey));
         }
@@ -25,17 +27,15 @@ namespace InfrastructureLayer.Email.SendGrid
         {
             var msg = new SendGridMessage
             {
-                From = new EmailAddress(_emailFrom),
+                From = new EmailAddress(_emailFrom, _nameFrom),
                 Subject = subject,
                 PlainTextContent = StripHtmlTags(message),
                 HtmlContent = message
             };
             msg.AddTo(new EmailAddress(emailTo));
 
-            //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-
             // disable tracking settings
-            // ref.: https://sendgrid.com/docs/User_Guide/Settings/tracking.html
+            // ref: https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.SetClickTracking(false, false);
             msg.SetOpenTracking(false);
             msg.SetGoogleAnalytics(false);
