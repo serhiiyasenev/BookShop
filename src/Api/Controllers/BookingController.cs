@@ -5,7 +5,6 @@ using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using InfrastructureLayer.Email.Interfaces;
-using InfrastructureLayer.Email.SendGrid;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -201,6 +200,9 @@ namespace Api.Controllers
         public async Task<IActionResult> UpdateBookingStatusById(Guid id, BookingStatus bookingStatus)
         {
             var updatedBooking = await _bookingService.UpdateItemStatusById(id, bookingStatus);
+            await _emailSender.SendEmailAsync(updatedBooking.CustomerEmail, 
+                "Your booking status was updated",
+                $"Your booking is: <br> <br> {updatedBooking}");
             return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }

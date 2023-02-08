@@ -25,25 +25,32 @@ namespace InfrastructureLayer.Email.SendGrid
 
         public async Task<(bool, string)> SendEmailAsync(string emailTo, string subject, string message)
         {
-            var msg = new SendGridMessage
+            try
             {
-                From = new EmailAddress(_emailFrom, _nameFrom),
-                Subject = subject,
-                PlainTextContent = StripHtmlTags(message),
-                HtmlContent = message
-            };
-            msg.AddTo(new EmailAddress(emailTo));
+                var msg = new SendGridMessage
+                {
+                    From = new EmailAddress(_emailFrom, _nameFrom),
+                    Subject = subject,
+                    PlainTextContent = StripHtmlTags(message),
+                    HtmlContent = message
+                };
+                msg.AddTo(new EmailAddress(emailTo));
 
-            // disable tracking settings
-            // ref: https://sendgrid.com/docs/User_Guide/Settings/tracking.html
-            msg.SetClickTracking(false, false);
-            msg.SetOpenTracking(false);
-            msg.SetGoogleAnalytics(false);
-            msg.SetSubscriptionTracking(false);
+                // disable tracking settings
+                // ref: https://sendgrid.com/docs/User_Guide/Settings/tracking.html
+                msg.SetClickTracking(false, false);
+                msg.SetOpenTracking(false);
+                msg.SetGoogleAnalytics(false);
+                msg.SetSubscriptionTracking(false);
 
-            var result = await _client.SendEmailAsync(msg);
+                var result = await _client.SendEmailAsync(msg);
 
-            return (result.IsSuccessStatusCode, await result.Body.ReadAsStringAsync());
+                return (result.IsSuccessStatusCode, await result.Body.ReadAsStringAsync());
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
         }
 
         private static string StripHtmlTags(string html)
