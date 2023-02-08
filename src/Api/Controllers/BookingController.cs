@@ -46,16 +46,23 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///       "deliveryAddress": "deliveryAddress 1234",
-        ///       "deliveryDate": "2023-12-03",
+        ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
+        ///       "deliveryDate": "2023-04-03",
         ///       "customerEmail": "serhii.yasenev+1@gmail.com",
         ///       "products": [
         ///         {
-        ///           "name": "name Test",
-        ///           "description": "description Test",
-        ///           "author": "author Test",
+        ///           "name": "MSDN Edition 1",
+        ///           "description": "MSDN was developed for managing the firm's relationship with developers and testers",
+        ///           "author": "John Doe",
         ///           "price": 12.34,
         ///           "imageUrl": "ftp://book.shop/downloads/image.jpg"
+        ///         },
+        ///         {
+        ///           "name": "MSDN Edition 2",
+        ///           "description": "This is a description 2 - short option",
+        ///           "author": "John Doe II",
+        ///           "price": 22.34,
+        ///           "imageUrl": "ftp://book.shop/downloads/image2.jpg"
         ///         }
         ///       ]
         ///     }
@@ -73,7 +80,7 @@ namespace Api.Controllers
             _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
 
             await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
-                $"Congratulations! Your booking is: <br/> {createdBooking}");
+                $"<center> Congratulations! </center> <br> Your booking is: <br> <br> {createdBooking}");
 
             _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
 
@@ -89,12 +96,12 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///       "deliveryAddress": "string",
-        ///       "deliveryDate": "2023-12-03",
+        ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
+        ///       "deliveryDate": "2023-04-03",
         ///       "products": [
-        ///         "Guid-1",
-        ///         "Guid-2",
-        ///         "Guid-3"
+        ///         "b6226a04-a337-4bbd-d263-08db0a0647bf",
+        ///         "07558f14-4680-409e-d264-08db0a0647bf",
+        ///         "7794d821-035f-454d-8a1c-12b085ef5917"
         ///       ]
         ///     }
         ///

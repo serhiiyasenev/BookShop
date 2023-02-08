@@ -25,12 +25,14 @@ namespace BusinessLayer.Models.Outbound
 
         public override string ToString()
         {
-            return $"1. Delivery Address: {DeliveryAddress} <br/>" +
-                   $"2. Customer Email: {CustomerEmail} <br/>" +
-                   $"3. Delivery Date: {DeliveryDate} <br/>" +
-                   $"4. Created Date: {CreatedDate.ToString("yyyy-MM-dd")} <br/>" +
-                   $"5. Booking Status: {Status} <br/>" +
-                   $"6. Products: {Products.Count()}";
+            var products = $"{ string.Join("<br>", Products.Select(e => e.ToString())) }";
+
+            return $"1. Delivery Address: <b> {DeliveryAddress} </b> <br>" +
+                   $"2. Customer Email: {CustomerEmail} <br>" +
+                   $"3. Delivery Date: <b> {DeliveryDate:dd-MMMM-yyyy} </b> <br>" +
+                   $"4. Created Date: {CreatedDate:dd-MMMM-yyyy} <br>" +
+                   $"5. Booking Status: {Status} <br>" +
+                   $"6. Products: <br> {products}";
         }
     }
 }
