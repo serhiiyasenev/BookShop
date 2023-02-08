@@ -75,14 +75,12 @@ namespace Api.Controllers
         public async Task<IActionResult> AddBooking(BookingInboundWithProducts booking)
         {
             var createdBooking = await _bookingService.AddItem(booking);
-
             _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
 
             await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
                 $"<b> Congratulations! </b> <br> <br> Your booking is: <br> <br> {createdBooking}");
 
             _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
-
             return CreatedAtAction(nameof(AddBooking), createdBooking);
         }
 
