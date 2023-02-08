@@ -1,6 +1,6 @@
 ﻿namespace Api.Helpers
 {
-    public class Settings
+    public class ImageStorageSettings
     {
         public string StoragePath { get; set; }
         public string AllowedExtensions { get; set; }

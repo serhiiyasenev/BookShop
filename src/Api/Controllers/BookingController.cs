@@ -4,6 +4,8 @@ using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
+using InfrastructureLayer.Email.Interfaces;
+using InfrastructureLayer.Email.SendGrid;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,14 +22,16 @@ namespace Api.Controllers
     {
         private readonly HttpContext _httpContext;
         private readonly ILogger<BookingController> _logger;
+        private readonly IEmailSender _emailSender;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
         private readonly IBookingService<BookingInboundWithProducts, BookingOutbound> _bookingService;
 
         public BookingController(ILogger<BookingController> logger, IHttpContextAccessor contextAccessor,
             IBookingService<BookingInboundWithProducts, BookingOutbound> bookingService, 
-            IProductService<ProductInbound, ProductOutbound> productService)
+            IProductService<ProductInbound, ProductOutbound> productService, IEmailSender emailSender)
         {
             _logger = logger;
+            _emailSender = emailSender;
             _productService = productService;
             _bookingService = bookingService;
             _httpContext = contextAccessor.HttpContext;
@@ -44,7 +48,7 @@ namespace Api.Controllers
         ///     {
         ///       "deliveryAddress": "deliveryAddress 1234",
         ///       "deliveryDate": "2023-12-03",
-        ///       "customerEmail": "user@example.com",
+        ///       "customerEmail": "serhii.yasenev+1@gmail.com",
         ///       "products": [
         ///         {
         ///           "name": "name Test",
@@ -64,9 +68,16 @@ namespace Api.Controllers
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> AddBooking(BookingInboundWithProducts booking)
         {
-            var createdbooking = await _bookingService.AddItem(booking);
-            _logger.LogInformation($"Booking was created with id: '{createdbooking.Id}'");
-            return CreatedAtAction(nameof(AddBooking), createdbooking);
+            var createdBooking = await _bookingService.AddItem(booking);
+
+            _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
+
+            await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
+                $"Congratulations! Your booking is: <br/> {createdBooking}");
+
+            _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
+
+            return CreatedAtAction(nameof(AddBooking), createdBooking);
         }
 
         /// <summary>
