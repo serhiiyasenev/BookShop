@@ -31,19 +31,21 @@ namespace BusinessLayer.Profiles
 
             CreateMap<BookingInboundWithProducts, BookingDto>()
                 .ForMember(dto => dto.Id, opt => opt.Ignore())
-                .ForMember(dto => dto.Products, opt => opt.MapFrom(inb => inb.Products))
+                .ForMember(dto => dto.CustomerEmail, opt => opt.MapFrom(inb => inb.CustomerEmail))
                 .ForMember(dto => dto.DeliveryAddress, opt => opt.MapFrom(inb => inb.DeliveryAddress))
                 .ForMember(dto => dto.DeliveryDate, opt => opt.MapFrom(inb => inb.DeliveryDate))
                 .ForMember(dto => dto.CreatedDate, opt => opt.MapFrom(inb => inb.CreatedDate))
-                .ForMember(dto => dto.Status, opt => opt.MapFrom(inb => (int)inb.Status));
+                .ForMember(dto => dto.Status, opt => opt.MapFrom(inb => (int)inb.Status))
+                .ForMember(dto => dto.Products, opt => opt.MapFrom(inb => inb.Products));
 
             CreateMap<BookingDto, BookingOutbound>()
                 .ForMember(outb => outb.Id, opt => opt.MapFrom(dto => dto.Id))
-                .ForMember(outb => outb.Products, opt => opt.MapFrom(dto => dto.Products))
+                .ForMember(outb => outb.CustomerEmail, opt => opt.MapFrom(dto => dto.CustomerEmail))
                 .ForMember(outb => outb.DeliveryAddress, opt => opt.MapFrom(dto => dto.DeliveryAddress))
                 .ForMember(outb => outb.DeliveryDate, opt => opt.MapFrom(dto => dto.DeliveryDate))
                 .ForMember(outb => outb.CreatedDate, opt => opt.MapFrom(dto => dto.CreatedDate))
-                .ForMember(outb => outb.Status, opt => opt.MapFrom(dto => (BookingStatus)dto.Status));
+                .ForMember(outb => outb.Status, opt => opt.MapFrom(dto => (BookingStatus)dto.Status))
+                .ForMember(outb => outb.Products, opt => opt.MapFrom(dto => dto.Products));
         }
     }
 }

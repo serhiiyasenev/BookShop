@@ -19,6 +19,8 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Inbound.Booking;
+using InfrastructureLayer.Email.SendGrid;
+using InfrastructureLayer.Email.Interfaces;
 
 namespace Api
 {
@@ -43,10 +45,13 @@ namespace Api
             services.AddScoped<IProductService<ProductInbound, ProductOutbound>, ProductService<ProductInbound, ProductOutbound>>();
             services.AddScoped<IBookingService<BookingInboundWithProducts, BookingOutbound>, BookingService<BookingInboundWithProducts, BookingOutbound>>();
 
+            services.AddScoped<IEmailSender, SendGridEmailSender>();
+
             services.AddDbContext<EfCoreContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.Configure<Settings>(Configuration.GetSection("Settings"));
+            services.Configure<ImageStorageSettings>(Configuration.GetSection("ImageStorageSettings"));
+            services.Configure<SendGridSettings>(Configuration.GetSection("SendGridSettings"));
 
             services.AddAutoMapper(new[] { Assembly.GetAssembly(typeof(BookingProfile)) });
 

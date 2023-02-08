@@ -19,12 +19,12 @@ namespace Api.Controllers
     [Produces("application/json")]
     public class ProductController : ControllerBase
     {
-        private readonly Settings _settings;
+        private readonly ImageStorageSettings _settings;
         private readonly HttpContext _httpContext;
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
 
-        public ProductController(ILogger<ProductController> logger, IOptions<Settings> settings,
+        public ProductController(ILogger<ProductController> logger, IOptions<ImageStorageSettings> settings,
             IProductService<ProductInbound, ProductOutbound> productService, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;

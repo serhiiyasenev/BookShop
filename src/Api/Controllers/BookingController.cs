@@ -4,6 +4,7 @@ using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
+using InfrastructureLayer.Email.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,14 +21,16 @@ namespace Api.Controllers
     {
         private readonly HttpContext _httpContext;
         private readonly ILogger<BookingController> _logger;
+        private readonly IEmailSender _emailSender;
         private readonly IProductService<ProductInbound, ProductOutbound> _productService;
         private readonly IBookingService<BookingInboundWithProducts, BookingOutbound> _bookingService;
 
         public BookingController(ILogger<BookingController> logger, IHttpContextAccessor contextAccessor,
             IBookingService<BookingInboundWithProducts, BookingOutbound> bookingService, 
-            IProductService<ProductInbound, ProductOutbound> productService)
+            IProductService<ProductInbound, ProductOutbound> productService, IEmailSender emailSender)
         {
             _logger = logger;
+            _emailSender = emailSender;
             _productService = productService;
             _bookingService = bookingService;
             _httpContext = contextAccessor.HttpContext;
@@ -42,15 +45,23 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///       "deliveryAddress": "deliveryAddress 1234",
-        ///       "deliveryDate": "2023-12-03",
+        ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
+        ///       "deliveryDate": "2023-04-03",
+        ///       "customerEmail": "email.test+1@gmail.com",
         ///       "products": [
         ///         {
-        ///           "name": "name Test",
-        ///           "description": "description Test",
-        ///           "author": "author Test",
+        ///           "name": "MSDN Edition 1",
+        ///           "description": "MSDN was developed for managing the firm's relationship with developers and testers",
+        ///           "author": "John Doe",
         ///           "price": 12.34,
         ///           "imageUrl": "ftp://book.shop/downloads/image.jpg"
+        ///         },
+        ///         {
+        ///           "name": "MSDN Edition 2",
+        ///           "description": "This is a description 2 - short option",
+        ///           "author": "John Doe II",
+        ///           "price": 22.34,
+        ///           "imageUrl": "ftp://book.shop/downloads/image2.jpg"
         ///         }
         ///       ]
         ///     }
@@ -63,9 +74,14 @@ namespace Api.Controllers
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> AddBooking(BookingInboundWithProducts booking)
         {
-            var createdbooking = await _bookingService.AddItem(booking);
-            _logger.LogInformation($"Booking was created with id: '{createdbooking.Id}'");
-            return CreatedAtAction(nameof(AddBooking), createdbooking);
+            var createdBooking = await _bookingService.AddItem(booking);
+            _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
+
+            await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
+                $"<b> Congratulations! </b> <br> <br> Your booking is: <br> <br> {createdBooking}");
+
+            _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
+            return CreatedAtAction(nameof(AddBooking), createdBooking);
         }
 
         /// <summary>
@@ -77,12 +93,12 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
-        ///       "deliveryAddress": "string",
-        ///       "deliveryDate": "2023-12-03",
+        ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
+        ///       "deliveryDate": "2023-04-03",
         ///       "products": [
-        ///         "Guid-1",
-        ///         "Guid-2",
-        ///         "Guid-3"
+        ///         "b6226a04-a337-4bbd-d263-08db0a0647bf",
+        ///         "07558f14-4680-409e-d264-08db0a0647bf",
+        ///         "7794d821-035f-454d-8a1c-12b085ef5917"
         ///       ]
         ///     }
         ///
@@ -182,6 +198,9 @@ namespace Api.Controllers
         public async Task<IActionResult> UpdateBookingStatusById(Guid id, BookingStatus bookingStatus)
         {
             var updatedBooking = await _bookingService.UpdateItemStatusById(id, bookingStatus);
+            await _emailSender.SendEmailAsync(updatedBooking.CustomerEmail, 
+                "Your booking status was updated",
+                $"Your booking is: <br> <br> {updatedBooking}");
             return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }

@@ -40,28 +40,29 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> GetById(Guid id)
         {
-            return await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).FirstOrDefaultAsync(b => b.Id.Equals(id));
+            return await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
         }
 
-        public async Task<BookingDto> UpdateById(Guid id, BookingDto booking)
+        public async Task<BookingDto> UpdateById(Guid id, BookingDto bookingUpdate)
         {
             var bookingDb = await _dbContext.Bookings.AsNoTracking()
-                .Include(p => p.Products).FirstOrDefaultAsync(b => b.Id.Equals(id));
+                .Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
 
             if (bookingDb == null)
             {
                 return null;
             }
 
-            if (booking.Products.Count() > 0)
+            if (bookingUpdate.Products.Count() > 0)
             {
                 var dbProducts = bookingDb.Products.ToList();
-                dbProducts.AddRange(booking.Products);
+                dbProducts.AddRange(bookingUpdate.Products);
                 bookingDb.Products = dbProducts;
             }
 
-            bookingDb.DeliveryDate = booking.DeliveryDate;
-            bookingDb.DeliveryAddress = booking.DeliveryAddress;
+            bookingDb.DeliveryDate = bookingUpdate.DeliveryDate;
+            bookingDb.DeliveryAddress = bookingUpdate.DeliveryAddress;
+            bookingDb.CustomerEmail = bookingUpdate.CustomerEmail;
 
             _dbContext.Attach(bookingDb);
             _dbContext.Entry(bookingDb).State = EntityState.Modified;
@@ -78,7 +79,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> UpdateStatusById(Guid id, int status)
         {
-            var booking = await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).FirstOrDefaultAsync(b => b.Id.Equals(id));
+            var booking = await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
             if (booking == null)
             {
                 return null;
