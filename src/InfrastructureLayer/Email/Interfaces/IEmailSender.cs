@@ -6,7 +6,7 @@ namespace InfrastructureLayer.Email.Interfaces
     {
         /// <summary>
         /// SendEmailAsync via connected provider <br/>
-        /// if `IsSendStatusSuccess=false` we should handle it
+        /// if IsSendStatusSuccess is false we should check ResponseBody message and handle it
         /// </summary>
         /// <param name="emailTo"></param>
         /// <param name="subject"></param>
