@@ -4,7 +4,7 @@ using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Inbound.Booking;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
-using InfrastructureLayer.Email.Interfaces;
+using InfrastructureLayer.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -201,6 +201,9 @@ namespace Api.Controllers
             await _emailSender.SendEmailAsync(updatedBooking.CustomerEmail, 
                 "Your booking status was updated",
                 $"Your booking is: <br> <br> {updatedBooking}");
+
+            //_telegramService.SendTextMessageAsync
+
             return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }

@@ -1,4 +1,4 @@
-﻿using InfrastructureLayer.Email.Interfaces;
+﻿using InfrastructureLayer.Interfaces;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;

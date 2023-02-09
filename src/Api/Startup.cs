@@ -20,7 +20,8 @@ using System.Text.Json.Serialization;
 using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Inbound.Booking;
 using InfrastructureLayer.Email.SendGrid;
-using InfrastructureLayer.Email.Interfaces;
+using InfrastructureLayer.Interfaces;
+using TgBot.Services.Telegram;
 
 namespace Api
 {
@@ -46,6 +47,7 @@ namespace Api
             services.AddScoped<IBookingService<BookingInboundWithProducts, BookingOutbound>, BookingService<BookingInboundWithProducts, BookingOutbound>>();
 
             services.AddScoped<IEmailSender, SendGridEmailSender>();
+            services.AddScoped<ITelegramService, TelegramService>();
 
             services.AddDbContext<EfCoreContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));

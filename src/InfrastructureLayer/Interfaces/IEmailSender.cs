@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace InfrastructureLayer.Email.Interfaces
+namespace InfrastructureLayer.Interfaces
 {
     public interface IEmailSender
     {
