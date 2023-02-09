@@ -11,13 +11,13 @@ namespace BusinessLayer.Models.Inbound
         public string Name { get; set; }
 
         /// <summary>
-        /// Page size (default 20)
+        /// Page size (default is 25)
         /// </summary>  
         [Range(1, 100)]
         public int PageSize { get; set; } = 25;
 
         /// <summary>
-        /// Page number (default 1 (started from first))
+        /// Page number (default is 1 (started from first))
         /// </summary>
         [Range(1, 10000)]
         public int Page { get; set; } = 1;
