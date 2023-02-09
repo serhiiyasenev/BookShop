@@ -14,7 +14,7 @@ namespace TgBot.Services.Telegram
     {
         private readonly long _chatId;
         private readonly TelegramSettings _options;
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly TelegramBotClient _telegramBotClient;
 
         public TelegramService(IOptions<TelegramSettings> options)
         {
