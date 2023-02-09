@@ -17,7 +17,7 @@ namespace BusinessLayer.Models.Inbound
         public int PageSize { get; set; } = 25;
 
         /// <summary>
-        /// Page number (default is 1 (started from first))
+        /// Page number (default is 1 (started from first page))
         /// </summary>
         [Range(1, 10000)]
         public int Page { get; set; } = 1;
