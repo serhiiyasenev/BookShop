@@ -1,6 +1,6 @@
 ﻿using DataAccessLayer.DTO;
+using DataAccessLayer.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,12 +18,12 @@ namespace DataAccessLayer.Interfaces
         Task<ProductDto> Add(ProductDto product);
 
         /// <summary>
-        /// Get all Products
+        /// Get all Products by predicate Items Request
         /// </summary>
         /// <returns>
         /// Products collection or empty collection
         /// </returns>
-        public IQueryable<ProductDto> GetAll();
+        Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request);
 
         /// <summary>
         /// Get Product by id

@@ -9,16 +9,19 @@ namespace DataAccessLayer.DTO
     public class BookingDto
     {
         [Key]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]
-        [MinLength(10)]
         [MaxLength(100)]
+        public string Name { get; set; }
+
+        [Required]
+        [MaxLength(200)]
         public string DeliveryAddress { get; set; }
 
         [Required]
-        [EmailAddress]
+        [MaxLength(128)]
         public string CustomerEmail { get; set; }
 
         [Required]
@@ -27,10 +30,10 @@ namespace DataAccessLayer.DTO
         [Required]
         public DateOnly DeliveryDate { get; set; }
 
+        [Required]
         public int Status { get; set; }
 
         [Required]
-        [MinLength(1, ErrorMessage = "At least 1 Product shoule be added")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
         public IEnumerable<ProductDto> Products { get; set; }
     }

@@ -1,9 +1,8 @@
 ﻿using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,25 +16,23 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> Add(BookingDto booking)
         {
-            booking.Id = Guid.NewGuid();
+            //booking.Id = Guid.NewGuid();
             var bookingEntity = await _dbContext.Bookings.AddAsync(booking);
             await _dbContext.SaveChangesAsync();
             return bookingEntity.Entity;
         }
 
-        public async Task<BookingDto> AddWithExistingProducts(BookingDto booking, IEnumerable<Guid> ids)
+        public async Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request)
         {
-            booking.Id = Guid.NewGuid();
-            var dbProducts = await _dbContext.Products.ToListAsync();
-            booking.Products = dbProducts.Where(e => ids.Contains(e.Id)).ToList();
-            var bookingEntity = await _dbContext.Bookings.AddAsync(booking);
-            await _dbContext.SaveChangesAsync();
-            return bookingEntity.Entity;
-        }
-
-        public IQueryable<BookingDto> GetAll()
-        {
-            return _dbContext.Bookings.AsNoTracking();
+            var query = _dbContext.Bookings.AsNoTracking();
+            if (!string.IsNullOrEmpty(request.ItemName))
+            {
+                query = query.Where(item => item.Name.Contains(request.ItemName));
+            }
+            // bottleneck ??
+            int totalCount = await query.CountAsync();
+            query = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
+            return (query, totalCount);
         }
 
         public async Task<BookingDto> GetById(Guid id)

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using BusinessLayer.Interfaces;
-using BusinessLayer.Models.Inbound.Product;
+using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Models;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,8 +12,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
 {
-    public class ProductService<Inbound, Outbound>
-        : IProductService<Inbound, Outbound> where Inbound : ProductInbound where Outbound : ProductOutbound
+    public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
@@ -23,28 +23,28 @@ namespace BusinessLayer.Services
             _productRepository = productRepository;
         }
 
-        public async Task<Outbound> AddItem(Inbound booking)
+        public async Task<ProductOutbound> AddItem(ProductInbound booking)
         {
             var dbItem = await _productRepository.Add(_mapper.Map<ProductDto>(booking));
-            return _mapper.Map<Outbound>(dbItem);
+            return _mapper.Map<ProductOutbound>(dbItem);
         }
 
-        public IQueryable<Outbound> GetAllItems()
+        public async Task<(IQueryable<ProductOutbound> FilteredItems, int TotalCount)> GetAll(RequestModel request)
         {
-            var dbItems = _productRepository.GetAll();
-            return _mapper.ProjectTo<Outbound>(dbItems);
+            var dbItems = await _productRepository.GetAll(_mapper.Map<ItemsRequest>(request));
+            return (_mapper.ProjectTo<ProductOutbound>(dbItems.FilteredItems), dbItems.TotalCount);
         }
 
-        public async Task<Outbound> GetItemById(Guid id)
+        public async Task<ProductOutbound> GetItemById(Guid id)
         {
             var dbItem = await _productRepository.GetById(id);
-            return _mapper.Map<Outbound>(dbItem);
+            return _mapper.Map<ProductOutbound>(dbItem);
         }
 
-        public async Task<Outbound> UpdateItemById(Guid id, Inbound booking)
+        public async Task<ProductOutbound> UpdateItemById(Guid id, ProductInbound booking)
         {
             var dbItem = await _productRepository.UpdateById(id, _mapper.Map<ProductDto>(booking));
-            return _mapper.Map<Outbound>(dbItem);
+            return _mapper.Map<ProductOutbound>(dbItem);
         }
 
         public async Task<int> RemoveItemById(Guid id)

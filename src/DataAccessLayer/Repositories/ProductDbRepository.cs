@@ -1,5 +1,6 @@
 ﻿using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
+using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -18,15 +19,23 @@ namespace DataAccessLayer.Repositories
 
         public async Task<ProductDto> Add(ProductDto product)
         {
-            product.Id = Guid.NewGuid();
+            //product.Id = Guid.NewGuid();
             var productEntity = await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
             return productEntity.Entity;
         }
 
-        public IQueryable<ProductDto> GetAll()
+        public async Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request)
         {
-           return _dbContext.Products.AsNoTracking();
+            var query = _dbContext.Products.AsNoTracking();
+            if (!string.IsNullOrEmpty(request.ItemName))
+            {
+                query = query.Where(item => item.Name.Contains(request.ItemName));
+            }
+            // bottleneck ??
+            int totalCount = await query.CountAsync();
+            query = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
+            return (query, totalCount);
         }
 
         public async Task<ProductDto> GetById(Guid id)

@@ -10,6 +10,8 @@ namespace BusinessLayer.Models.Outbound
     {
         public Guid Id { get; set; }
 
+        public string Name { get; set; }
+
         public string DeliveryAddress { get; set; }
 
         public string CustomerEmail { get; set; }

@@ -1,10 +1,10 @@
 ﻿using Api.Helpers;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
-using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -22,10 +22,10 @@ namespace Api.Controllers
         private readonly ImageStorageSettings _settings;
         private readonly HttpContext _httpContext;
         private readonly ILogger<ProductController> _logger;
-        private readonly IProductService<ProductInbound, ProductOutbound> _productService;
+        private readonly IProductService _productService;
 
-        public ProductController(ILogger<ProductController> logger, IOptions<ImageStorageSettings> settings,
-            IProductService<ProductInbound, ProductOutbound> productService, IHttpContextAccessor contextAccessor)
+        public ProductController(ILogger<ProductController> logger, IProductService productService,
+             IOptions<ImageStorageSettings> settings, IHttpContextAccessor contextAccessor)
         {
             _logger = logger;
             _settings = settings.Value;
@@ -52,6 +52,9 @@ namespace Api.Controllers
         /// </remarks>
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">If the item is incorrect</response>
+        /// /// <remarks>
+        /// The endpoint return newly created Product
+        /// </remarks>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(ProductOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
@@ -63,12 +66,15 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Upload image file to local or cloud storage
+        /// Upload image file to local or cloud storage endpoint
         /// </summary>
         /// <param name="image"></param>
         /// <response code="200">Returns successfully saved message</response>
         /// <response code="400">If the item is incorrect</response>
         /// <response code="500">If internal server error</response>
+        /// /// <remarks>
+        /// The endpoint return Simple Result message
+        /// </remarks>
         [HttpPost]
         [Route("Image")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
@@ -104,16 +110,15 @@ namespace Api.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
-        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts([FromQuery] GetItemsRequest request)
+        public async Task<ActionResult<ResponseModel<ProductOutbound>>> GetAllProducts([FromQuery] RequestModel request)
         {
-            var requestTest = request;
-            var contextTest = _httpContext;
-            // it will be updated to get results via predicates From Query string and Context
-            var products = _productService.GetAllItems();
+            var products = await _productService.GetAll(request);
             var result = new ResponseModel<ProductOutbound>
             {
-                Items = products,
-                TotalCount = products.Count()
+                Items = products.FilteredItems,
+                TotalCount = products.TotalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
             };
             return Ok(result);
         }
@@ -152,7 +157,7 @@ namespace Api.Controllers
         /// Delete Product by id endpoint
         /// </summary>
         /// <remarks>
-        /// The endpoint returns pointed Guid
+        /// The endpoint return Simple Result message
         /// </remarks>
         [HttpDelete("{id}")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]

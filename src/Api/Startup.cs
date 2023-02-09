@@ -1,11 +1,12 @@
 using Api.Helpers;
 using BusinessLayer.Interfaces;
-using BusinessLayer.Models.Outbound;
 using BusinessLayer.Profiles;
 using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Repositories;
+using InfrastructureLayer.Email.Interfaces;
+using InfrastructureLayer.Email.SendGrid;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.IO;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using BusinessLayer.Models.Inbound.Product;
-using BusinessLayer.Models.Inbound.Booking;
-using InfrastructureLayer.Email.SendGrid;
-using InfrastructureLayer.Email.Interfaces;
 
 namespace Api
 {
@@ -42,8 +39,8 @@ namespace Api
             services.AddScoped<IProductRepository, ProductDbRepository>();
             services.AddScoped<IBookingRepository, BookingDbRepository>();
 
-            services.AddScoped<IProductService<ProductInbound, ProductOutbound>, ProductService<ProductInbound, ProductOutbound>>();
-            services.AddScoped<IBookingService<BookingInboundWithProducts, BookingOutbound>, BookingService<BookingInboundWithProducts, BookingOutbound>>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IBookingService, BookingService>();
 
             services.AddScoped<IEmailSender, SendGridEmailSender>();
 

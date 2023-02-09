@@ -1,6 +1,6 @@
 ﻿using DataAccessLayer.DTO;
+using DataAccessLayer.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,21 +18,12 @@ namespace DataAccessLayer.Interfaces
         Task<BookingDto> Add(BookingDto booking);
 
         /// <summary>
-        /// Add Booking with existing Products
-        /// </summary>
-        /// <param name="booking"></param>
-        /// <returns>
-        /// Newly created Booking
-        /// </returns>
-        Task<BookingDto> AddWithExistingProducts(BookingDto booking, IEnumerable<Guid> ids);
-
-        /// <summary>
-        /// Get all Bookings
+        /// Get all Bookings by predicate Items Request
         /// </summary>
         /// <returns>
         /// Bookings collection or empty collection
         /// </returns>
-        IQueryable<BookingDto> GetAll();
+        Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request);
 
         /// <summary>
         /// Get Booking by id
