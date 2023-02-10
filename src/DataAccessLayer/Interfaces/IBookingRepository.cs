@@ -36,14 +36,13 @@ namespace DataAccessLayer.Interfaces
         Task<BookingDto> GetById(Guid id);
 
         /// <summary>
-        /// Update Booking by id
+        /// Update existing Booking
         /// </summary>
-        /// <param name="id"></param>
         /// <param name="booking"></param>
         /// <returns>
-        /// Updated Booking or null if Product was not found by id
+        /// Updated Booking
         /// </returns>
-        Task<BookingDto> UpdateById(Guid id, BookingDto booking);
+        Task<BookingDto> Update(BookingDto booking);
 
         /// <summary>
         /// Update Booking status by id

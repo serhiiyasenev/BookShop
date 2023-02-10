@@ -25,7 +25,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default)
         {
-            var query = _dbContext.Bookings.AsNoTracking();
+            var query = _dbContext.Bookings.Include(e => e.Products).AsNoTracking();
             if (!string.IsNullOrEmpty(request.ItemName))
             {
                 query = query.Where(item => item.Name.Contains(request.ItemName));
@@ -41,38 +41,12 @@ namespace DataAccessLayer.Repositories
             return await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
         }
 
-        public async Task<BookingDto> UpdateById(Guid id, BookingDto bookingUpdate)
+        public async Task<BookingDto> Update(BookingDto bookingUpdate)
         {
-            var bookingDb = await _dbContext.Bookings.AsNoTracking()
-                .Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
-
-            if (bookingDb == null)
-            {
-                return null;
-            }
-
-            if (bookingUpdate.Products.Count() > 0)
-            {
-                var dbProducts = bookingDb.Products.ToList();
-                dbProducts.AddRange(bookingUpdate.Products);
-                bookingDb.Products = dbProducts;
-            }
-
-            bookingDb.DeliveryDate = bookingUpdate.DeliveryDate;
-            bookingDb.DeliveryAddress = bookingUpdate.DeliveryAddress;
-            bookingDb.CustomerEmail = bookingUpdate.CustomerEmail;
-
-            _dbContext.Attach(bookingDb);
-            _dbContext.Entry(bookingDb).State = EntityState.Modified;
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return null;
-            }
-            return bookingDb;
+            _dbContext.Attach(bookingUpdate);
+            _dbContext.Entry(bookingUpdate).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            return bookingUpdate;
         }
 
         public async Task<BookingDto> UpdateStatusById(Guid id, int status)

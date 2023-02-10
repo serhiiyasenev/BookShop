@@ -20,28 +20,15 @@ namespace BusinessLayer.Services
         private readonly IProductRepository _productRepository;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IMapper mapper, IBookingRepository bookingRepository)
+        public BookingService(IMapper mapper, IBookingRepository bookingRepository, IProductRepository productRepository)
         {
             _mapper = mapper;
+            _productRepository = productRepository;
             _bookingRepository = bookingRepository;
         }
 
         public async Task<BookingOutbound> AddItem(BookingInbound booking, CancellationToken cancellationToken = default)
         {
-            var products = new List<ProductDto>();
-            foreach (var id in booking.Products)
-            {
-                var product = await _productRepository.GetById(id);
-                if (product == null)
-                {
-                   throw new Exception(message: $"Product Not Found by id: '{id}'");
-                }
-                else
-                {
-                    products.Add(product);
-                }
-            }
-
             var bookingDto = new BookingDto
             {
                 Name            = booking.Name,
@@ -50,7 +37,7 @@ namespace BusinessLayer.Services
                 DeliveryAddress = booking.DeliveryAddress,
                 DeliveryDate    = booking.DeliveryDate,
                 Status          = (int) booking.Status, 
-                Products        = products
+                Products        = await GetExistingNotLinkedProducts(booking.Products)
             };
 
             var dbItem = await _bookingRepository.Add(bookingDto);
@@ -69,9 +56,35 @@ namespace BusinessLayer.Services
             return _mapper.Map<BookingOutbound>(dbItem);
         }
 
-        public async Task<BookingOutbound> UpdateItemById(Guid id, BookingInbound booking)
+        public async Task<BookingOutbound> UpdateItemById(Guid id, BookingInbound bookingToUpdate)
         {
-            var dbItem = await _bookingRepository.UpdateById(id, _mapper.Map<BookingDto>(booking));
+            var existingBooking = await _bookingRepository.GetById(id);
+
+            if (existingBooking == null)
+            {
+                throw new Exception(message: $"Booking Not Found by id: '{id}'");
+            }
+
+            var linkedProducts = existingBooking.Products.ToList();
+            if (bookingToUpdate.Products?.Count() > 0)
+            {
+                var existingProducts = await GetExistingNotLinkedProducts(bookingToUpdate.Products);
+                linkedProducts.AddRange(existingProducts);
+            }
+
+            var bookingDto = new BookingDto
+            {
+                Id              = existingBooking.Id,
+                Name            = bookingToUpdate.Name,
+                CustomerEmail   = bookingToUpdate.CustomerEmail,
+                CreatedDate     = existingBooking.CreatedDate,
+                DeliveryAddress = bookingToUpdate.DeliveryAddress,
+                DeliveryDate    = bookingToUpdate.DeliveryDate,
+                Status          = existingBooking.Status,
+                Products        = linkedProducts
+            };
+
+            var dbItem = await _bookingRepository.Update(bookingDto);
             return _mapper.Map<BookingOutbound>(dbItem);
         }
 
@@ -79,6 +92,37 @@ namespace BusinessLayer.Services
         {
             var dbItem = await _bookingRepository.UpdateStatusById(id, (int)status);
             return _mapper.Map<BookingOutbound>(dbItem);
+        }
+
+        private async Task<List<ProductDto>> GetExistingNotLinkedProducts(IEnumerable<Guid> ids)
+        {
+            await CheckExistingNotLinkedProductsById(ids);
+            var products = new List<ProductDto>();
+            foreach (var id in ids)
+            {
+                var product = await _productRepository.GetById(id);
+                products.Add(product);
+            }
+            return products;
+        }
+
+        private async Task CheckExistingNotLinkedProductsById(IEnumerable<Guid> ids)
+        {
+            if (ids.Count() == 0)
+                throw new ArgumentNullException($"Booking should have at least one product");
+
+            foreach (var id in ids)
+            {
+                var product = await _productRepository.GetById(id);
+                if (product == null)
+                {
+                    throw new Exception(message: $"Product Not Found by id: '{id}'");
+                }
+                if (product.BookingDtoId != null)
+                {
+                    throw new Exception(message: $"Product with id '{product.Id}' already linked to booking with id '{product.BookingDtoId}'");
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
+using DataAccessLayer.DTO;
 using InfrastructureLayer.Email.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,19 +44,19 @@ namespace Api.Controllers
         /// Sample request:
         ///
         ///     {
+        ///       "name": "My perfect books for vacation",
         ///       "deliveryAddress": "20 Cooper Square, New York, NY 10003, USA",
         ///       "deliveryDate": "2023-04-03",
         ///       "customerEmail": "email.test@gmail.com",
         ///       "products": [
         ///         "b6226a04-a337-4bbd-d263-08db0a0647bf",
-        ///         "07558f14-4680-409e-d264-08db0a0647bf",
-        ///         "7794d821-035f-454d-8a1c-12b085ef5917"
+        ///         "07558f14-4680-409e-d264-08db0a0647bf"
         ///       ]
         ///     }
         ///
         /// </remarks>
         /// <response code="201">Returns the newly created item</response>
-        /// <response code="400">If the item is incorrect</response>
+        /// <response code="400">If the item is incorrect or Product already mapped to other booking</response>
         /// <response code="404">If the product id is incorrect</response>
         /// <remarks>
         /// The endpoint returns newly created Booking
@@ -63,8 +64,8 @@ namespace Api.Controllers
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(BookingOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
-        [ProducesResponseType(404, Type = typeof(SimpleResult))]
-        [ProducesResponseType(500, Type = typeof(SimpleResult))]
+        [ProducesResponseType(404, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(500, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> AddBooking(BookingInbound bookingInbound)
         {
             try
@@ -82,15 +83,18 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains("Not found"))
+                if (ex.Message.Contains("Not Found"))
                 {
-                    return NotFound(new SimpleResult { Result = ex.Message });
+                    return NotFound(new ProblemDetails { Title = "Not Found by id", Detail = ex.Message });
+                }
+                else if (ex.Message.Contains("already linked"))
+                {
+                    return BadRequest(new ProblemDetails { Title = "Product already linked", Detail = ex.Message });
                 }
                 else
                 {
-                    return StatusCode(500, new SimpleResult { Result = ex.Message });
+                    return StatusCode(500, new ProblemDetails {Title = "Server error", Detail = ex.Message });
                 }
-                
             }
         }
 
@@ -134,20 +138,41 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Update Booking by id
+        /// Update Booking endpoint
         /// </summary>
+        /// /// <param name="id"></param>
+        /// <param name="bookingToUpdate"></param>
+        /// <returns>A newly created Booking item</returns>
         /// <remarks>
+        /// Sample request:
+        ///
+        ///     {
+        ///       "name": "My perfect books for vacation Update",
+        ///       "deliveryAddress": "Update 20 Cooper Square, New York, NY 10003, USA",
+        ///       "deliveryDate": "2023-04-03",
+        ///       "customerEmail": "email.Update@gmail.com",
+        ///       "products": [
+        ///         "b6226a04-a337-4bbd-d263-08db0a0647bf",
+        ///         "07558f14-4680-409e-d264-08db0a0647bf"
+        ///       ]
+        ///     }
+        ///
         /// The endpoint returns newly updated Booking <br/>
         /// It will add new producs if you specified them in producs array <br/>
-        /// <b> If you need just update Booking without adding new products, skip `products []` here</b>
+        /// <b> If you need just update Booking without adding new products, skip `products []` here </b> <br/>
+        /// (it will not remove previously added products)
         /// </remarks>
+        /// <response code="200">Returns the newly updated item</response>
+        /// <response code="400">If the item is incorrect or Product already mapped to other booking</response>
+        /// <response code="404">If the product id is incorrect</response>
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
+        [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
-        public async Task<IActionResult> UpdateBookingById(Guid id, BookingInbound booking)
+        public async Task<IActionResult> UpdateBookingById(Guid id, BookingInbound bookingToUpdate)
         {
-            var updatedBooking = await _bookingService.UpdateItemById(id, booking);
-            return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+            var updatedBooking = await _bookingService.UpdateItemById(id, bookingToUpdate);
+            return Ok(updatedBooking);
         }
 
         /// <summary>
