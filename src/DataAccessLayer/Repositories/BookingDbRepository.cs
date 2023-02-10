@@ -38,7 +38,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> GetById(Guid id)
         {
-            return await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
+            return await _dbContext.Bookings.Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
         }
 
         public async Task<BookingDto> Update(BookingDto bookingUpdate)
@@ -52,21 +52,12 @@ namespace DataAccessLayer.Repositories
         public async Task<BookingDto> UpdateStatusById(Guid id, int status)
         {
             var booking = await _dbContext.Bookings.AsNoTracking().Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
-            if (booking == null)
-            {
-                return null;
-            }
+            if (booking == null) return null;
+
             booking.Status = status;
             _dbContext.Attach(booking);
             _dbContext.Entry(booking).State = EntityState.Modified;
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return null;
-            }
+            await _dbContext.SaveChangesAsync();
             return booking;
         }
     }

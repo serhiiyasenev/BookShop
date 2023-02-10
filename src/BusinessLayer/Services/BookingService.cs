@@ -6,6 +6,7 @@ using BusinessLayer.Models.Outbound;
 using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace BusinessLayer.Services
                 DeliveryAddress = booking.DeliveryAddress,
                 DeliveryDate    = booking.DeliveryDate,
                 Status          = (int) booking.Status, 
-                Products        = await GetExistingNotLinkedProducts(booking.Products)
+                Products        = await GetExistingNotLinkedProductsById(booking.Products)
             };
 
             var dbItem = await _bookingRepository.Add(bookingDto);
@@ -68,7 +69,8 @@ namespace BusinessLayer.Services
             var linkedProducts = existingBooking.Products.ToList();
             if (bookingToUpdate.Products?.Count() > 0)
             {
-                var existingProducts = await GetExistingNotLinkedProducts(bookingToUpdate.Products);
+                var existingProducts = await GetExistingNotLinkedProductsById(bookingToUpdate.Products);
+                existingProducts.ForEach(e => e.BookingDtoId = existingBooking.Id);
                 linkedProducts.AddRange(existingProducts);
             }
 
@@ -94,22 +96,12 @@ namespace BusinessLayer.Services
             return _mapper.Map<BookingOutbound>(dbItem);
         }
 
-        private async Task<List<ProductDto>> GetExistingNotLinkedProducts(IEnumerable<Guid> ids)
-        {
-            await CheckExistingNotLinkedProductsById(ids);
-            var products = new List<ProductDto>();
-            foreach (var id in ids)
-            {
-                var product = await _productRepository.GetById(id);
-                products.Add(product);
-            }
-            return products;
-        }
-
-        private async Task CheckExistingNotLinkedProductsById(IEnumerable<Guid> ids)
+        private async Task<List<ProductDto>> GetExistingNotLinkedProductsById(IEnumerable<Guid> ids)
         {
             if (ids.Count() == 0)
                 throw new ArgumentNullException($"Booking should have at least one product");
+
+            var products = new List<ProductDto>();
 
             foreach (var id in ids)
             {
@@ -122,7 +114,10 @@ namespace BusinessLayer.Services
                 {
                     throw new Exception(message: $"Product with id '{product.Id}' already linked to booking with id '{product.BookingDtoId}'");
                 }
+                products.Add(product);
             }
+
+            return products;
         }
     }
 }
