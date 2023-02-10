@@ -9,6 +9,7 @@ using DataAccessLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -25,7 +26,7 @@ namespace BusinessLayer.Services
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<BookingOutbound> AddItem(BookingInbound booking)
+        public async Task<BookingOutbound> AddItem(BookingInbound booking, CancellationToken cancellationToken = default)
         {
             var products = new List<ProductDto>();
             foreach (var id in booking.Products)
@@ -56,7 +57,7 @@ namespace BusinessLayer.Services
             return _mapper.Map<BookingOutbound>(dbItem);
         }
 
-        public async Task<(IQueryable<BookingOutbound> FilteredItems, int TotalCount)> GetAll(RequestModel request)
+        public async Task<(IQueryable<BookingOutbound> FilteredItems, int TotalCount)> GetAll(RequestModel request, CancellationToken cancellationToken = default)
         {
             var result = await _bookingRepository.GetAll(_mapper.Map<ItemsRequest>(request));
             return (_mapper.ProjectTo<BookingOutbound>(result.FilteredItems), result.TotalCount);

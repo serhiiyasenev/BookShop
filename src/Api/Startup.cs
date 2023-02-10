@@ -1,5 +1,5 @@
-using Api.Helpers;
 using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Files;
 using BusinessLayer.Profiles;
 using BusinessLayer.Services;
 using DataAccessLayer;
@@ -42,13 +42,15 @@ namespace Api
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IBookingService, BookingService>();
 
+            services.AddScoped<IFileUploadService, FileUploadLocalService>();
             services.AddScoped<IEmailSender, SendGridEmailSender>();
 
             services.AddDbContext<EfCoreContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.Configure<ImageStorageSettings>(Configuration.GetSection("ImageStorageSettings"));
-            services.Configure<SendGridSettings>(Configuration.GetSection("SendGridSettings"));
+            services.Configure<AllowedExtensions>(Configuration.GetSection(nameof(AllowedExtensions)));
+            services.Configure<ImageStorageSettings>(Configuration.GetSection(nameof(ImageStorageSettings)));
+            services.Configure<SendGridSettings>(Configuration.GetSection(nameof(SendGridSettings)));
 
             services.AddAutoMapper(new[] { Assembly.GetAssembly(typeof(BookingProfile)) });
 

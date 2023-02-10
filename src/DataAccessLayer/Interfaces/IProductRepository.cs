@@ -2,6 +2,7 @@
 using DataAccessLayer.Models;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -23,7 +24,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Products collection or empty collection
         /// </returns>
-        Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request);
+        Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Product by id

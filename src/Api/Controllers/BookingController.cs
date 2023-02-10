@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -101,12 +102,12 @@ namespace Api.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<BookingOutbound>))]
-        public async Task<ActionResult<ResponseModel<BookingOutbound>>> GetAllProducts([FromQuery] RequestModel request)
+        public async Task<ActionResult<ResponseModel<BookingOutbound>>> GetAllProducts([FromQuery] RequestModel request, CancellationToken cancellationToken = default)
         {
             var contextTest = _httpContext.User;
             // it will be updated to get results due to Context
 
-            var bookings = await _bookingService.GetAll(request);
+            var bookings = await _bookingService.GetAll(request, cancellationToken);
             var result = new ResponseModel<BookingOutbound>()
             {
                 Items = bookings.FilteredItems,   

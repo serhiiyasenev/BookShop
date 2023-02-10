@@ -2,6 +2,7 @@
 using DataAccessLayer.Models;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -15,7 +16,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Newly created Booking
         /// </returns>
-        Task<BookingDto> Add(BookingDto booking);
+        Task<BookingDto> Add(BookingDto booking, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all Bookings by predicate Items Request
@@ -23,7 +24,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Bookings collection or empty collection
         /// </returns>
-        Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request);
+        Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Booking by id

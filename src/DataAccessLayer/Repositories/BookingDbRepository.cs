@@ -4,6 +4,7 @@ using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
@@ -14,15 +15,15 @@ namespace DataAccessLayer.Repositories
         {
         }
 
-        public async Task<BookingDto> Add(BookingDto booking)
+        public async Task<BookingDto> Add(BookingDto booking, CancellationToken cancellationToken = default)
         {
             //booking.Id = Guid.NewGuid();
-            var bookingEntity = await _dbContext.Bookings.AddAsync(booking);
-            await _dbContext.SaveChangesAsync();
+            var bookingEntity = await _dbContext.Bookings.AddAsync(booking, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             return bookingEntity.Entity;
         }
 
-        public async Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request)
+        public async Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Bookings.AsNoTracking();
             if (!string.IsNullOrEmpty(request.ItemName))
@@ -30,7 +31,7 @@ namespace DataAccessLayer.Repositories
                 query = query.Where(item => item.Name.Contains(request.ItemName));
             }
             // bottleneck ??
-            int totalCount = await query.CountAsync();
+            int totalCount = await query.CountAsync(cancellationToken);
             query = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
             return (query, totalCount);
         }

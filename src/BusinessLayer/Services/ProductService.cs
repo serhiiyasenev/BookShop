@@ -8,6 +8,7 @@ using DataAccessLayer.Models;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BusinessLayer.Services
@@ -23,15 +24,15 @@ namespace BusinessLayer.Services
             _productRepository = productRepository;
         }
 
-        public async Task<ProductOutbound> AddItem(ProductInbound booking)
+        public async Task<ProductOutbound> AddItem(ProductInbound booking, CancellationToken cancellationToken = default)
         {
             var dbItem = await _productRepository.Add(_mapper.Map<ProductDto>(booking));
             return _mapper.Map<ProductOutbound>(dbItem);
         }
 
-        public async Task<(IQueryable<ProductOutbound> FilteredItems, int TotalCount)> GetAll(RequestModel request)
+        public async Task<(IQueryable<ProductOutbound> FilteredItems, int TotalCount)> GetAll(RequestModel request, CancellationToken cancellationToken = default)
         {
-            var dbItems = await _productRepository.GetAll(_mapper.Map<ItemsRequest>(request));
+            var dbItems = await _productRepository.GetAll(_mapper.Map<ItemsRequest>(request), cancellationToken);
             return (_mapper.ProjectTo<ProductOutbound>(dbItems.FilteredItems), dbItems.TotalCount);
         }
 
@@ -50,23 +51,6 @@ namespace BusinessLayer.Services
         public async Task<int> RemoveItemById(Guid id)
         {
             return await _productRepository.RemoveItemById(id);
-        }
-
-        public async Task<(bool, string)> SaveImage(string path, Stream image)
-        {
-            try
-            {
-                using (var fileStream = new FileStream(path, FileMode.Create))
-                {
-                    await image.CopyToAsync(fileStream);
-                }
-
-                return (true, "Saved successfully");
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message);
-            }
         }
     }
 }

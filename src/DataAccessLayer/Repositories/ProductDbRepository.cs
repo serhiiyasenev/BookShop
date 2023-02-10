@@ -4,6 +4,7 @@ using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
@@ -25,7 +26,7 @@ namespace DataAccessLayer.Repositories
             return productEntity.Entity;
         }
 
-        public async Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request)
+        public async Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default)
         {
             var query = _dbContext.Products.AsNoTracking();
             if (!string.IsNullOrEmpty(request.ItemName))
@@ -33,7 +34,7 @@ namespace DataAccessLayer.Repositories
                 query = query.Where(item => item.Name.Contains(request.ItemName));
             }
             // bottleneck ??
-            int totalCount = await query.CountAsync();
+            int totalCount = await query.CountAsync(cancellationToken);
             query = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
             return (query, totalCount);
         }
@@ -48,14 +49,7 @@ namespace DataAccessLayer.Repositories
             product.Id = id;
             _dbContext.Attach(product);
             _dbContext.Entry(product).State = EntityState.Modified;
-            try
-            {
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return null;
-            }
+            await _dbContext.SaveChangesAsync();
             return product;
         }
 
