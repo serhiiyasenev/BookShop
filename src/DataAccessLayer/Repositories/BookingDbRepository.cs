@@ -38,7 +38,8 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> GetById(Guid id)
         {
-            return await _dbContext.Bookings.Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
+            return await _dbContext.Bookings.AsNoTracking()
+                                   .Include(p => p.Products).SingleOrDefaultAsync(b => b.Id.Equals(id));
         }
 
         public async Task<BookingDto> Update(BookingDto bookingUpdate)
