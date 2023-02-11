@@ -16,7 +16,7 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Newly created Product
         /// </returns>
-        Task<ProductDto> Add(ProductDto product);
+        Task<ProductDto> Add(ProductDto product, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get all Products by predicate Items Request
