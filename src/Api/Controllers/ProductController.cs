@@ -111,7 +111,7 @@ namespace Api.Controllers
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
-        public async Task<ActionResult<ResponseModel<ProductOutbound>>> GetAllProducts([FromQuery] RequestModel request, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllProducts([FromQuery] RequestModel request, CancellationToken cancellationToken = default)
         {
             var products = await _productService.GetAll(request, cancellationToken);
             var result = new ResponseModel<ProductOutbound>
