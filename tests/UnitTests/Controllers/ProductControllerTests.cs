@@ -34,34 +34,15 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task AddProduct_Returns_CorrectModel()
+        public async Task AddProduct_Returns_CorrectModels()
         {
             // Arrange
-            var productInbound = new ProductInbound
-            {
-                Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
-                Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
-                Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
-                ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
-            };
-
-            var expectedOutbound = new ProductOutbound
-            {
-                Id = Guid.NewGuid(),
-                Name = productInbound.Name,
-                Description = productInbound.Description,
-                Author = productInbound.Author,
-                Price = productInbound.Price,
-                ImageUrl = productInbound.ImageUrl,
-                BookingId = null
-            };
-
-            _productServiceMock.Setup(x => x.AddItem(productInbound, It.IsAny<CancellationToken>()))
-                               .ReturnsAsync(expectedOutbound);
+            var expectedProductOutbound = new ProductOutbound();
+            _productServiceMock.Setup(x => x.AddItem(It.IsAny<ProductInbound>(),
+                It.IsAny<CancellationToken>())).ReturnsAsync(expectedProductOutbound);
 
             // Act
-            var result = await _productController.AddProduct(productInbound);
+            var result = await _productController.AddProduct(It.IsAny<ProductInbound>());
 
             // Assert
             var createdResult = result as CreatedAtActionResult;
@@ -70,11 +51,12 @@ namespace UnitTests
 
             var actualResult = createdResult.Value as ProductOutbound;
             Assert.IsInstanceOf<ProductOutbound>(actualResult);
-            _productServiceMock.Verify(x => x.AddItem(productInbound, It.IsAny<CancellationToken>()), Times.Once);
+            Assert.That(actualResult, Is.EqualTo(expectedProductOutbound));
+            _productServiceMock.Verify(x => x.AddItem(It.IsAny<ProductInbound>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
-        public async Task AddProduct_Returns_CorrectProduct()
+        public async Task AddProduct_Returns_CorrectProductValues()
         {
             // Arrange
             var productInbound = new ProductInbound
