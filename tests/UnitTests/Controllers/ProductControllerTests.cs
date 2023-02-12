@@ -165,11 +165,11 @@ namespace UnitTests
             var expectedItems = new List<ProductOutbound>
             {
                 new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 1", 
-                Author = "", Price = 12.5f, ImageUrl = "https://test.com" , 
+                Author = "Author 1", Price = 12.5f, ImageUrl = "https://test.com" , 
                 Description = "test description", BookingId = Guid.NewGuid() },
                 new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 2",
-                Author = "", Price = 55.15f, ImageUrl = "ftp://test2.com" ,
-                Description = "test description 22", BookingId = Guid.NewGuid()}
+                Author = "Author 2", Price = 55.15f, ImageUrl = "ftp://test2.com" ,
+                Description = "test description 22", BookingId = null}
             }.AsQueryable();
 
             var expectedModel = new ResponseModel<ProductOutbound>
@@ -187,8 +187,9 @@ namespace UnitTests
             var result = await _productController.GetAllProducts(request, cancellationToken);
 
             // Assert
-            Assert.IsInstanceOf<ObjectResult>(result);
+            Assert.IsInstanceOf<OkObjectResult>(result);
             var responseBody = (result as OkObjectResult).Value as ResponseModel<ProductOutbound>;
+
             Assert.AreEqual(responseBody.Items, expectedModel.Items);
             Assert.AreEqual(responseBody.TotalCount, expectedModel.TotalCount);
             Assert.AreEqual(responseBody.Page, request.Page);
