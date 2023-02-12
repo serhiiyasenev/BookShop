@@ -3,11 +3,15 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Files;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Moq;
 using NUnit.Framework;
+using System.Linq;
+using System.Text;
 
 namespace UnitTests
 {
@@ -24,11 +28,13 @@ namespace UnitTests
         [SetUp]
         public void SetUp()
         {
-            _logger= new Mock<ILogger<ProductController>>();
+            _logger = new Mock<ILogger<ProductController>>();
             _productServiceMock = new Mock<IProductService>();
             _loggerMock = new Mock<ILogger<ProductController>>();
-            _allowedExtensionsMock = new Mock<IOptions<AllowedExtensions>>();
             _fileUploadServiceMock = new Mock<IFileUploadService>();
+            _allowedExtensionsMock = new Mock<IOptions<AllowedExtensions>>();
+            _allowedExtensionsMock.SetupGet(x => x.Value).Returns(new AllowedExtensions { ImageAllowed = ".jpg;.png;.jpeg" });
+
             _productController = new ProductController(_loggerMock.Object, _productServiceMock.Object, 
                                                _allowedExtensionsMock.Object, _fileUploadServiceMock.Object);
         }
@@ -95,6 +101,59 @@ namespace UnitTests
             Assert.That(actualResult.Price, Is.EqualTo(expectedOutbound.Price));
             Assert.That(actualResult.ImageUrl, Is.EqualTo(expectedOutbound.ImageUrl));
             Assert.That(actualResult.BookingId, Is.EqualTo(expectedOutbound.BookingId));
+        }
+
+        [Test]
+        [TestCase(0, "NotFound by id: 'guid'")]
+        [TestCase(1, "Product with id 'guid' was deleted")]
+        public async Task DeleteProduct_Returns_SimpleResult(int result, string message)
+        {
+            // Arrange
+            Guid id = Guid.NewGuid();
+            _productServiceMock.Setup(x => x.RemoveItemById(id))
+                .ReturnsAsync(result);
+            message = message.Replace("guid", id.ToString());
+
+            // Act
+            var objectResult = await _productController.DeleteProduct(id);
+
+            // Assert
+            var responseBody = (SimpleResult)((ObjectResult)objectResult).Value;
+            Assert.That(responseBody.Result, Is.EqualTo(message));
+        }
+
+        [Test]
+        [TestCase(true, "test-image.jpg", "Image `test-image.jpg` saved to Image Storage by path", 200)]
+        [TestCase(false, "test-image.txt", "Not Allowed `test-image.txt`, extension should be from `.jpg;.png;.jpeg`", 400)]
+        [TestCase(false, "test-image.jpg", "Failed to save image `test-image.jpg`to Image Storage now.", 500)]
+        public async Task AddProductImage_Returns_SimpleResult(bool uploadResult, string fileName, string message, int expectedStatusCode)
+        {
+            // Arrange
+            var imageMock = new Mock<IFormFile>(); 
+            var fileStream = new MemoryStream(Encoding.UTF8.GetBytes("test-image-content")); 
+            imageMock.Setup(f => f.FileName).Returns(fileName);
+            imageMock.Setup(f => f.OpenReadStream()).Returns(fileStream);
+            var invockedCount = Times.Once;
+            var expectedResult = (Result: uploadResult, Message: message);
+            _fileUploadServiceMock.Setup(s => s.FileUpload(fileName, fileStream)).ReturnsAsync(expectedResult);
+
+            // Act
+            var result = await _productController.AddProductImage(imageMock.Object);
+
+            // Assert
+            Assert.IsInstanceOf<ObjectResult>(result);
+            var statusCodeResult = (ObjectResult)result;
+            var resultValue = (SimpleResult)((ObjectResult)result).Value;
+            Assert.AreEqual(expectedStatusCode, statusCodeResult.StatusCode);
+            Assert.AreEqual(expectedResult.Message, resultValue.Result);
+
+            if (expectedStatusCode == 400) invockedCount = Times.Never;
+
+            _fileUploadServiceMock.Verify(x => x.FileUpload(fileName, fileStream), invockedCount);
+
+            _loggerMock.Verify(x => x.Log(Microsoft.Extensions.Logging.LogLevel.Information, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(expectedResult.Message)),
+                It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), invockedCount);
         }
     }
 }
