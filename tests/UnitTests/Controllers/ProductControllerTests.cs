@@ -56,7 +56,7 @@ namespace UnitTests
 
             var actualResult = createdResult.Value as ProductOutbound;
             Assert.IsInstanceOf<ProductOutbound>(actualResult);
-            Assert.That(actualResult, Is.EqualTo(expectedProductOutbound));
+            Assert.AreEqual(expectedProductOutbound, actualResult);
             _productServiceMock.Verify(x => x.AddItem(It.IsAny<ProductInbound>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -92,33 +92,33 @@ namespace UnitTests
             var actualResult = ((CreatedAtActionResult)result).Value as ProductOutbound;
 
             // Assert
-            Assert.That(actualResult, Is.Not.Null);
-            Assert.That(actualResult.Id, Is.EqualTo(expectedOutbound.Id));
-            Assert.That(actualResult.Name, Is.EqualTo(expectedOutbound.Name));
-            Assert.That(actualResult.Description, Is.EqualTo(expectedOutbound.Description));
-            Assert.That(actualResult.Author, Is.EqualTo(expectedOutbound.Author));
-            Assert.That(actualResult.Price, Is.EqualTo(expectedOutbound.Price));
-            Assert.That(actualResult.ImageUrl, Is.EqualTo(expectedOutbound.ImageUrl));
-            Assert.That(actualResult.BookingId, Is.EqualTo(expectedOutbound.BookingId));
+            Assert.IsNotNull(actualResult);
+            Assert.AreEqual(expectedOutbound.Id, actualResult.Id);
+            Assert.AreEqual(expectedOutbound.Name, actualResult.Name);
+            Assert.AreEqual(expectedOutbound.Description, actualResult.Description);
+            Assert.AreEqual(expectedOutbound.Author, actualResult.Author);
+            Assert.AreEqual(expectedOutbound.Price, actualResult.Price);
+            Assert.AreEqual(expectedOutbound.ImageUrl, actualResult.ImageUrl);
+            Assert.AreEqual(expectedOutbound.BookingId, actualResult.BookingId);
         }
 
         [Test]
         [TestCase(0, "NotFound by id: 'guid'")]
         [TestCase(1, "Product with id 'guid' was deleted")]
-        public async Task DeleteProduct_Returns_SimpleResult(int result, string message)
+        public async Task DeleteProduct_Returns_SimpleResult(int result, string expectedMessage)
         {
             // Arrange
             Guid id = Guid.NewGuid();
             _productServiceMock.Setup(x => x.RemoveItemById(id))
                 .ReturnsAsync(result);
-            message = message.Replace("guid", id.ToString());
+            expectedMessage = expectedMessage.Replace("guid", id.ToString());
 
             // Act
             var objectResult = await _productController.DeleteProduct(id);
 
             // Assert
             var responseBody = (SimpleResult)((ObjectResult)objectResult).Value;
-            Assert.That(responseBody.Result, Is.EqualTo(message));
+            Assert.AreEqual(expectedMessage, responseBody?.Result);
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace UnitTests
             var statusCodeResult = (ObjectResult)result;
             var resultValue = (SimpleResult)((ObjectResult)result).Value;
             Assert.AreEqual(expectedStatusCode, statusCodeResult.StatusCode);
-            Assert.AreEqual(expectedResult.Message, resultValue.Result);
+            Assert.AreEqual(expectedResult.Message, resultValue?.Result);
 
             if (expectedStatusCode == 400) invockedCount = Times.Never;
 
