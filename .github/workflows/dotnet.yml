@@ -33,7 +33,7 @@ jobs:
       with:
         reports: 'coverage/*/coverage.cobertura.xml'
         targetdir: 'coveragereport'
-        reporttypes: 'HtmlInline;Cobertura'
+        reporttypes: 'HtmlChart;HtmlInline;Cobertura'
 
     - name: Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
