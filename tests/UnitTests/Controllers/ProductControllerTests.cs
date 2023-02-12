@@ -154,5 +154,45 @@ namespace UnitTests
                 It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(expectedResult.Message)),
                 It.IsAny<Exception>(),It.Is<Func<It.IsAnyType, Exception?, string>>((f, e) => true)), invockedCount);
         }
+
+        [Test]
+        public async Task GetAllProducts_Should_Return_OkResult()
+        {
+            // Arrange
+            var request = new RequestModel { Page = 1, PageSize = 10 };
+            var cancellationToken = CancellationToken.None;
+
+            var expectedItems = new List<ProductOutbound>
+            {
+                new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 1", 
+                Author = "", Price = 12.5f, ImageUrl = "https://test.com" , 
+                Description = "test description", BookingId = Guid.NewGuid() },
+                new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 2",
+                Author = "", Price = 55.15f, ImageUrl = "ftp://test2.com" ,
+                Description = "test description 22", BookingId = Guid.NewGuid()}
+            }.AsQueryable();
+
+            var expectedModel = new ResponseModel<ProductOutbound>
+            {
+                Items = expectedItems,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalCount = expectedItems.Count()
+            };
+
+            _productServiceMock.Setup(x => x.GetAll(request, cancellationToken))
+                 .ReturnsAsync((expectedItems, expectedItems.Count()));
+
+            // Act
+            var result = await _productController.GetAllProducts(request, cancellationToken);
+
+            // Assert
+            Assert.IsInstanceOf<ObjectResult>(result);
+            var responseBody = (result as OkObjectResult).Value as ResponseModel<ProductOutbound>;
+            Assert.AreEqual(responseBody.Items, expectedModel.Items);
+            Assert.AreEqual(responseBody.TotalCount, expectedModel.TotalCount);
+            Assert.AreEqual(responseBody.Page, request.Page);
+            Assert.AreEqual(responseBody.PageSize, request.PageSize);
+        }
     }
 }
