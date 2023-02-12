@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using Moq;
 using NUnit.Framework;
-using System.Linq;
 using System.Text;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace UnitTests
 {
@@ -151,9 +150,9 @@ namespace UnitTests
 
             _fileUploadServiceMock.Verify(x => x.FileUpload(fileName, fileStream), invockedCount);
 
-            _loggerMock.Verify(x => x.Log(Microsoft.Extensions.Logging.LogLevel.Information, It.IsAny<EventId>(),
+            _loggerMock.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(expectedResult.Message)),
-                It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), invockedCount);
+                It.IsAny<Exception>(),It.Is<Func<It.IsAnyType, Exception?, string>>((f, e) => true)), invockedCount);
         }
     }
 }
