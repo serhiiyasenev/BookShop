@@ -21,7 +21,7 @@ namespace DataAccessLayer.Repositories
         public async Task<ProductDto> Add(ProductDto product, CancellationToken cancellationToken = default)
         {
             //product.Id = Guid.NewGuid();
-            var productEntity = await _dbContext.Products.AddAsync(product);
+            var productEntity = await _dbContext.Products.AddAsync(product, cancellationToken);
             await _dbContext.SaveChangesAsync();
             return productEntity.Entity;
         }

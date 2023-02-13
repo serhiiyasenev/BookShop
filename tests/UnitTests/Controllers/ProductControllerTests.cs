@@ -15,24 +15,22 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 namespace UnitTests
 {
     [TestFixture]
-    public class ProductControllerTests
+    public class ProductControllerTests : BaseTest
     {
-        private Mock<ILogger<ProductController>> _logger;
         private Mock<IProductService> _productServiceMock;
         private Mock<ILogger<ProductController>> _loggerMock;
         private Mock<IOptions<AllowedExtensions>> _allowedExtensionsMock;
         private Mock<IFileUploadService> _fileUploadServiceMock;
         private ProductController _productController;
 
-        [SetUp]
-        public void SetUp()
+        public ProductControllerTests()
         {
-            _logger = new Mock<ILogger<ProductController>>();
             _productServiceMock = new Mock<IProductService>();
             _loggerMock = new Mock<ILogger<ProductController>>();
             _fileUploadServiceMock = new Mock<IFileUploadService>();
             _allowedExtensionsMock = new Mock<IOptions<AllowedExtensions>>();
-            _allowedExtensionsMock.SetupGet(x => x.Value).Returns(new AllowedExtensions { ImageAllowed = ".jpg;.png;.jpeg" });
+            _allowedExtensionsMock.SetupGet(x => x.Value).Returns(
+                new AllowedExtensions { ImageAllowed = ".jpg;.png;.jpeg" });
 
             _productController = new ProductController(_loggerMock.Object, _productServiceMock.Object, 
                                                _allowedExtensionsMock.Object, _fileUploadServiceMock.Object);
