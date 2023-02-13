@@ -1,7 +1,12 @@
-﻿using Api.Helpers;
+﻿using Api;
+using Api.Helpers;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
-using Microsoft.eShopWeb.FunctionalTests.Web.Controllers;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
 
 namespace IntegrationTests.Controllers
@@ -11,12 +16,21 @@ namespace IntegrationTests.Controllers
     {
         private readonly string _requestUri;
         private readonly HttpClient _httpClient;
-        private readonly CustomWebApplicationFactory _factory;
+        private readonly WebApplicationFactory<Startup> _factory;
 
         public ProductControllerIntegrationTests()
         {
             _requestUri = "/product";
-            _factory = new CustomWebApplicationFactory();
+            _factory = new WebApplicationFactory<Startup>()
+                .WithWebHostBuilder(builder => 
+                builder.ConfigureServices(services =>
+                {
+                    services.RemoveAll(typeof(EfCoreContext));
+                    services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
+                    
+                    services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase("TestDb"));
+                }
+            ));
             _httpClient = _factory.CreateClient();
         }
 
@@ -37,6 +51,8 @@ namespace IntegrationTests.Controllers
 
 
             // Act
+            //var allProduct = await (await _httpClient.GetAsync(_requestUri))
+            //     .EnsureSuccessStatusCode().GetModelAsync<ResponseModel<ProductOutbound>>();
             var createdProduct = await (await _httpClient.PostAsync(_requestUri, content))
                  .EnsureSuccessStatusCode().GetModelAsync<ProductOutbound>();
 
