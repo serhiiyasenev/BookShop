@@ -8,12 +8,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.eShopWeb.FunctionalTests.Web.Controllers
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Startup>
+    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
+       
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
             {
+                var efCoreContext = services.Single(e => e.ImplementationType == typeof(EfCoreContext));;
+                var removed = services.Remove(efCoreContext);
+
                 services.AddEntityFrameworkInMemoryDatabase();
 
                 // Create a new service provider.

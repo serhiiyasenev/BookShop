@@ -1,10 +1,8 @@
-﻿using Api;
-using Api.Helpers;
+﻿using Api.Helpers;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using Microsoft.eShopWeb.FunctionalTests.Web.Controllers;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 
 namespace IntegrationTests.Controllers
 {
