@@ -28,6 +28,9 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
     
+    - name: Codecov
+      uses: codecov/codecov-action@v3
+  
     - name: ReportGenerator
       uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
       with:
