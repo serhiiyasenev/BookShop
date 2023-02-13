@@ -30,6 +30,9 @@ jobs:
     
     - name: Codecov
       uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true
   
     - name: ReportGenerator
       uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
