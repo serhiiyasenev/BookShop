@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace BusinessLayer.Models.Inbound
@@ -23,9 +24,11 @@ namespace BusinessLayer.Models.Inbound
         [StringLength(128, MinimumLength = 6, ErrorMessage = "Customer Email must be between 6 and 100 characters")]
         public string CustomerEmail { get; set; }
 
+        [JsonIgnore]
         [ReadOnly(true)]
         public DateTime CreatedDate => DateTime.UtcNow;
 
+        [JsonIgnore]
         [ReadOnly(true)]
         public BookingStatus Status => BookingStatus.Submitted;
 
