@@ -36,7 +36,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Create Booking with existing products endpoint
+        /// Create Booking with existing products
         /// </summary>
         /// <param name="bookingInbound"></param>
         /// <returns>A newly created Booking item</returns>
@@ -56,15 +56,18 @@ namespace Api.Controllers
         ///
         /// </remarks>
         /// <response code="201">Returns the newly created item</response>
-        /// <response code="400">If the item is incorrect or Product already mapped to other booking</response>
+        /// <response code="400">If the item is incorrect</response>
         /// <response code="404">If the product id is incorrect</response>
+        /// <response code="409">If the product is already linked to another Booking</response>
+        /// <response code="500">Internal Server Error</response>
         /// <remarks>
-        /// The endpoint returns newly created Booking
+        /// The returns newly created Booking
         /// </remarks>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(BookingOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         [ProducesResponseType(404, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(409, Type = typeof(ProblemDetails))]
         [ProducesResponseType(500, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> AddBooking(BookingInbound bookingInbound)
         {
@@ -83,13 +86,14 @@ namespace Api.Controllers
             }
             catch (Exception ex)
             {
+                // it will be updated by adding centralized Exception handling
                 if (ex.Message.Contains("Not Found"))
                 {
                     return NotFound(new ProblemDetails { Title = "Not Found by id", Detail = ex.Message });
                 }
                 else if (ex.Message.Contains("already linked"))
                 {
-                    return BadRequest(new ProblemDetails { Title = "Product already linked", Detail = ex.Message });
+                    return Conflict(new ProblemDetails { Title = "Product already linked", Detail = ex.Message });
                 }
                 else
                 {
@@ -99,10 +103,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Get all Bookings endpoint
+        /// Get all Bookings
         /// </summary>
         /// <remarks>
-        /// The endpoint returns all Bookings from a storage (selected by RequestModel predicate)
+        /// The returns all Bookings from a storage (selected by RequestModel predicate)
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<BookingOutbound>))]
@@ -123,10 +127,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Get Booking by id endpoint
+        /// Get Booking by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns pointed by it's Guid Booking from a storage
+        /// The returns pointed by it's Guid Booking from a storage
         /// </remarks>
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
@@ -138,9 +142,9 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Update Booking endpoint
+        /// Update Booking
         /// </summary>
-        /// /// <param name="id"></param>
+        /// <param name="id"></param>
         /// <param name="bookingToUpdate"></param>
         /// <returns>A newly created Booking item</returns>
         /// <remarks>
@@ -157,18 +161,20 @@ namespace Api.Controllers
         ///       ]
         ///     }
         ///
-        /// The endpoint returns newly updated Booking <br/>
+        /// The returns newly updated Booking <br/>
         /// It will add new producs if you specified them in producs array <br/>
         /// <b> If you need just update Booking without adding new products, skip `products []` here </b> <br/>
         /// (it will not remove previously added products)
         /// </remarks>
         /// <response code="200">Returns the newly updated item</response>
-        /// <response code="400">If the item is incorrect or Product already mapped to other booking</response>
+        /// <response code="400">If the item is incorrect</response>
         /// <response code="404">If the product id is incorrect</response>
+        /// <response code="409">If the product item in booking is already mapped</response>
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
+        [ProducesResponseType(409, Type = typeof(SimpleResult))]
         public async Task<IActionResult> UpdateBookingById(Guid id, BookingInbound bookingToUpdate)
         {
             var updatedBooking = await _bookingService.UpdateItemById(id, bookingToUpdate);
@@ -179,7 +185,7 @@ namespace Api.Controllers
         /// Update Booking status by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns newly updated Booking
+        /// The returns newly updated Booking
         /// </remarks>
         [HttpPatch("{id}")]
         [ProducesResponseType(200, Type = typeof(BookingOutbound))]

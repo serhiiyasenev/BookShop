@@ -12,7 +12,7 @@ using NUnit.Framework;
 using System.Text;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
-namespace UnitTests
+namespace UnitTests.Controllers
 {
     [TestFixture]
     public class ProductControllerTests : BaseTest
@@ -23,7 +23,8 @@ namespace UnitTests
         private Mock<IFileUploadService> _fileUploadServiceMock;
         private ProductController _productController;
 
-        public ProductControllerTests()
+        [SetUp]
+        public void SetUp()
         {
             _productServiceMock = new Mock<IProductService>();
             _loggerMock = new Mock<ILogger<ProductController>>();
@@ -32,12 +33,12 @@ namespace UnitTests
             _allowedExtensionsMock.SetupGet(x => x.Value).Returns(
                 new AllowedExtensions { ImageAllowed = ".jpg;.png;.jpeg" });
 
-            _productController = new ProductController(_loggerMock.Object, _productServiceMock.Object, 
+            _productController = new ProductController(_loggerMock.Object, _productServiceMock.Object,
                                                _allowedExtensionsMock.Object, _fileUploadServiceMock.Object);
         }
 
         [Test]
-        public async Task AddProduct_Returns_CorrectModels()
+        public async Task AddProduct_Saves_NewlyCreatedProduct()
         {
             // Arrange
             var expectedProductOutbound = new ProductOutbound();
@@ -121,36 +122,38 @@ namespace UnitTests
 
         [Test]
         [TestCase(true, "test-image.jpg", "Image `test-image.jpg` saved to Image Storage by path", 200)]
-        [TestCase(false, "test-image.txt", "Not Allowed `test-image.txt`, extension should be from `.jpg;.png;.jpeg`", 400)]
-        [TestCase(false, "test-image.jpg", "Failed to save image `test-image.jpg`to Image Storage now.", 500)]
+        [TestCase(false, "test-image.txt", "Not Allowed 'test-image.txt', extension should be from '.jpg;.png;.jpeg'", 400)]
+        [TestCase(false, "test-image.jpg", "Failed to save image 'test-image.jpg' to Image Storage now.", 500)]
         public async Task AddProductImage_Returns_SimpleResult(bool uploadResult, string fileName, string message, int expectedStatusCode)
         {
             // Arrange
-            var imageMock = new Mock<IFormFile>(); 
-            var fileStream = new MemoryStream(Encoding.UTF8.GetBytes("test-image-content")); 
+            var imageMock = new Mock<IFormFile>();
+            var fileStream = new MemoryStream(Encoding.UTF8.GetBytes("test-image-content"));
             imageMock.Setup(f => f.FileName).Returns(fileName);
             imageMock.Setup(f => f.OpenReadStream()).Returns(fileStream);
             var invockedCount = Times.Once;
             var expectedResult = (Result: uploadResult, Message: message);
-            _fileUploadServiceMock.Setup(s => s.FileUpload(fileName, fileStream)).ReturnsAsync(expectedResult);
+            _fileUploadServiceMock.Setup(s => s.UploadFile(fileName, fileStream)).ReturnsAsync(expectedResult);
 
             // Act
             var result = await _productController.AddProductImage(imageMock.Object);
 
             // Assert
+            Assert.IsNotNull(result);
             Assert.IsInstanceOf<ObjectResult>(result);
-            var statusCodeResult = (ObjectResult)result;
-            var resultValue = (SimpleResult)((ObjectResult)result).Value;
-            Assert.AreEqual(expectedStatusCode, statusCodeResult.StatusCode);
+            var objectResult = (ObjectResult)result;
+            Assert.IsNotNull(objectResult);
+            var resultValue = (SimpleResult)objectResult.Value;
+            Assert.AreEqual(expectedStatusCode, objectResult.StatusCode);
             Assert.AreEqual(expectedResult.Message, resultValue?.Result);
 
             if (expectedStatusCode == 400) invockedCount = Times.Never;
 
-            _fileUploadServiceMock.Verify(x => x.FileUpload(fileName, fileStream), invockedCount);
+            _fileUploadServiceMock.Verify(x => x.UploadFile(fileName, fileStream), invockedCount);
 
             _loggerMock.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(expectedResult.Message)),
-                It.IsAny<Exception>(),It.Is<Func<It.IsAnyType, Exception?, string>>((f, e) => true)), invockedCount);
+                It.IsAny<Exception>(), It.Is<Func<It.IsAnyType, Exception?, string>>((f, e) => true)), invockedCount);
         }
 
         [Test]
@@ -162,8 +165,8 @@ namespace UnitTests
 
             var expectedItems = new List<ProductOutbound>
             {
-                new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 1", 
-                Author = "Author 1", Price = 12.5f, ImageUrl = "https://test.com" , 
+                new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 1",
+                Author = "Author 1", Price = 12.5f, ImageUrl = "https://test.com" ,
                 Description = "test description", BookingId = Guid.NewGuid() },
                 new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 2",
                 Author = "Author 2", Price = 55.15f, ImageUrl = "ftp://test2.com" ,
@@ -185,9 +188,10 @@ namespace UnitTests
             var result = await _productController.GetAllProducts(request, cancellationToken);
 
             // Assert
+            Assert.IsNotNull(result);
             Assert.IsInstanceOf<OkObjectResult>(result);
-            var responseBody = (result as OkObjectResult).Value as ResponseModel<ProductOutbound>;
-
+            var responseBody = (result as OkObjectResult)?.Value as ResponseModel<ProductOutbound>;
+            Assert.IsNotNull(responseBody);
             Assert.AreEqual(responseBody.Items, expectedModel.Items);
             Assert.AreEqual(responseBody.TotalCount, expectedModel.TotalCount);
             Assert.AreEqual(responseBody.Page, request.Page);

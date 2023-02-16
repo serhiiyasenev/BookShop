@@ -15,7 +15,8 @@ namespace BusinessLayer.Services
         {
             _settings = settings.Value;
         }
-        public async Task<(bool, string)> FileUpload(string fileName, Stream image)
+
+        public async Task<(bool, string)> UploadFile(string fileName, Stream image)
         {
             try
             {
