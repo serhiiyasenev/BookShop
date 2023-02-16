@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Xml.Serialization;
 
 namespace BusinessLayer.Models.Inbound
 {
@@ -23,10 +24,10 @@ namespace BusinessLayer.Models.Inbound
         public string CustomerEmail { get; set; }
 
         [ReadOnly(true)]
-        internal DateTime CreatedDate => DateTime.UtcNow;
+        public DateTime CreatedDate => DateTime.UtcNow;
 
         [ReadOnly(true)]
-        internal BookingStatus Status => BookingStatus.Submitted;
+        public BookingStatus Status => BookingStatus.Submitted;
 
         private DateOnly _deliveryDate;
 

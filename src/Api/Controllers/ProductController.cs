@@ -37,7 +37,7 @@ namespace Api.Controllers
         /// Create Product
         /// </summary>
         /// <param name="product"></param>
-        /// /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>A newly created Product item</returns>
         /// <remarks>
         /// Sample request:
@@ -53,8 +53,8 @@ namespace Api.Controllers
         /// </remarks>
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">If the item is incorrect</response>
-        /// /// <remarks>
-        /// The endpoint return newly created Product
+        /// <remarks>
+        /// The return newly created Product
         /// </remarks>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(ProductOutbound))]
@@ -67,14 +67,14 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Upload image file to local or cloud storage endpoint
+        /// Upload image file to local or cloud storage
         /// </summary>
         /// <param name="image"></param>
         /// <response code="200">Returns uploaded file path</response>
         /// <response code="400">If the item is incorrect</response>
         /// <response code="500">If internal server error</response>
-        /// /// <remarks>
-        /// The endpoint return Simple Result message
+        /// <remarks>
+        /// The return Simple Result message
         /// </remarks>
         [HttpPost]
         [Route("Image")]
@@ -83,31 +83,29 @@ namespace Api.Controllers
         [ProducesResponseType(500, Type = typeof(SimpleResult))]
         public async Task<IActionResult> AddProductImage(IFormFile image)
         {
-            string fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.ImageAllowed.Split(";").ToList().Contains(fileExtension))
-            {
-                return BadRequest(new SimpleResult { Result = $"Not Allowed `{image.FileName}`, extension should be from `{_allowedExtensions.ImageAllowed}`" });
-            }
+            var filName = image.FileName;
+            var validationResult = ValidateFileExtension(filName, _allowedExtensions.ImageAllowed);
+            if (validationResult != null) return validationResult;
 
-            var result = await _fileUploadService.FileUpload(image.FileName, image.OpenReadStream());
+            var result = await _fileUploadService.UploadFile(filName, image.OpenReadStream());
 
             if (result.IsSaved)
             {
-                _logger.LogInformation($"Image `{image.FileName}` saved to Image Storage by path `{result.Message}`");
+                _logger.LogInformation($"Image '{filName}' saved to Image Storage by path '{result.Message}'");
                 return Ok(new SimpleResult { Result = result.Message });
             }
             else
             {
-                _logger.LogInformation($"Image `{image.FileName}` wasn't saved to Image Storage due to `{result.Message}`'");
-                return StatusCode(500, new SimpleResult { Result = $"Failed to save image `{image.FileName}`to Image Storage now." });
+                _logger.LogInformation($"Image '{filName}' wasn't saved to Image Storage due to '{result.Message}'");
+                return StatusCode(500, new SimpleResult { Result = $"Failed to save image '{filName}' to Image Storage now." });
             }
         }
 
         /// <summary>
-        /// Get all Products endpoint
+        /// Get all Products
         /// </summary>
         /// <remarks>
-        /// The endpoint returns all Products from a storage
+        /// The returns all Products from a storage
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
@@ -125,10 +123,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Get Product by id endpoint
+        /// Get Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns pointed by it's Guid Product from a storage
+        /// The returns pointed by it's Guid Product from a storage
         /// </remarks>
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(ProductOutbound))]
@@ -140,10 +138,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Update Product by id endpoint
+        /// Update Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns newly updated Product by Guid
+        /// The returns newly updated Product by Guid
         /// </remarks>
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(ProductOutbound))]
@@ -155,10 +153,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Delete Product by id endpoint
+        /// Delete Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint return Simple Result message
+        /// The return Simple Result message
         /// </remarks>
         [HttpDelete("{id}")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
@@ -168,6 +166,19 @@ namespace Api.Controllers
             var result = await _productService.RemoveItemById(id);
             return result > 0 ? Ok(new SimpleResult { Result = $"Product with id '{id}' was deleted" }) 
                               : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+        }
+
+        private IActionResult ValidateFileExtension(string filName, string allowedExtensions)
+        {
+            string fileExtension = Path.GetExtension(filName).ToLowerInvariant();
+
+            if (!allowedExtensions.Split(";").ToList().Contains(fileExtension))
+            {
+                var result = new SimpleResult { Result = $"Not Allowed '{filName}', extension should be from '{allowedExtensions}'" };
+                return BadRequest(result);
+            }
+
+            return null;
         }
     }
 }

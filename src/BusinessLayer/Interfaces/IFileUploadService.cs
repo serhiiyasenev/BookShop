@@ -11,6 +11,6 @@ namespace BusinessLayer.Interfaces
         /// <param name="fileName"></param>
         /// <param name="fileContent"></param>
         /// <returns>Saved status and message as path to file if successful or error message if not</returns>
-        Task<(bool IsSaved, string Message)> FileUpload(string fileName, Stream fileContent);
+        Task<(bool IsSaved, string Message)> UploadFile(string fileName, Stream fileContent);
     }
 }

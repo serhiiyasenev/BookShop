@@ -17,7 +17,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> Add(BookingDto booking, CancellationToken cancellationToken = default)
         {
-            //booking.Id = Guid.NewGuid();
             var bookingEntity = await _dbContext.Bookings.AddAsync(booking, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return bookingEntity.Entity;

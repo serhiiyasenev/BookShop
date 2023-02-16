@@ -6,7 +6,7 @@ using BusinessLayer.Models.Inbound;
 using DataAccessLayer.Models;
 using System.Linq;
 
-namespace BusinessLayer.Profiles
+namespace BusinessLayer.Mappings
 {
     public class BookingProfile : Profile
     {

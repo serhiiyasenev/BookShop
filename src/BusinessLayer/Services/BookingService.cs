@@ -30,6 +30,11 @@ namespace BusinessLayer.Services
 
         public async Task<BookingOutbound> AddItem(BookingInbound booking, CancellationToken cancellationToken = default)
         {
+            if (booking.Products.Count() == 0)
+                throw new ArgumentNullException($"Booking should have at least one product");
+
+            var products = await GetExistingNotLinkedProductsById(booking.Products);
+
             var bookingDto = new BookingDto
             {
                 Name            = booking.Name,
@@ -38,7 +43,7 @@ namespace BusinessLayer.Services
                 DeliveryAddress = booking.DeliveryAddress,
                 DeliveryDate    = booking.DeliveryDate,
                 Status          = (int) booking.Status, 
-                Products        = await GetExistingNotLinkedProductsById(booking.Products)
+                Products        = products
             };
 
             var dbItem = await _bookingRepository.Add(bookingDto);
@@ -79,7 +84,7 @@ namespace BusinessLayer.Services
                 Id              = existingBooking.Id,
                 Name            = bookingToUpdate.Name,
                 CustomerEmail   = bookingToUpdate.CustomerEmail,
-                CreatedDate     = existingBooking.CreatedDate,
+                CreatedDate     = existingBooking.CreatedDate,                
                 DeliveryAddress = bookingToUpdate.DeliveryAddress,
                 DeliveryDate    = bookingToUpdate.DeliveryDate,
                 Status          = existingBooking.Status,
@@ -98,9 +103,6 @@ namespace BusinessLayer.Services
 
         private async Task<List<ProductDto>> GetExistingNotLinkedProductsById(IEnumerable<Guid> ids)
         {
-            if (ids.Count() == 0)
-                throw new ArgumentNullException($"Booking should have at least one product");
-
             var products = new List<ProductDto>();
 
             foreach (var id in ids)
