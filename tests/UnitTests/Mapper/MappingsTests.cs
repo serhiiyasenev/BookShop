@@ -7,6 +7,7 @@ using DataAccessLayer.DTO;
 using DataAccessLayer.Models;
 using FluentAssertions;
 using NUnit.Framework;
+using System;
 
 namespace UnitTests.Mapper
 {
@@ -32,7 +33,9 @@ namespace UnitTests.Mapper
             var result = _mapper.Map<ItemsRequest>(requestModel);
 
             // Assert
-            result.Should().BeEquivalentTo(requestModel);
+            result.ItemName.Should().Be(requestModel.Name);
+            result.PageNumber.Should().Be(requestModel.Page);
+            result.PageSize.Should().Be(requestModel.PageSize);
         }
 
         [Test]
@@ -52,7 +55,13 @@ namespace UnitTests.Mapper
             var result = _mapper.Map<ProductDto>(productInbound);
 
             // Assert
-            productInbound.Should().BeEquivalentTo(result, opt => opt.Excluding(d => d.BookingDtoId));
+            result.Id.Should().Be(Guid.Empty);
+            result.Name.Should().Be(productInbound.Name);
+            result.Description.Should().Be(productInbound.Description);
+            result.Author.Should().Be(productInbound.Author);
+            result.Price.Should().Be(productInbound.Price);
+            result.ImageUrl.Should().Be(productInbound.ImageUrl);
+            result.BookingDtoId.Should().Be(null);
         }
 
         [Test]
