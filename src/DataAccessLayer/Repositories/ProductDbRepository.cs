@@ -54,17 +54,11 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> RemoveItemById(Guid id)
         {
-            var product = new ProductDto { Id = id };
-            _dbContext.Attach(product);
-            _dbContext.Entry(product).State = EntityState.Deleted;
-            try
-            {
-                return await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return 0;
-            }
+            var product = await _dbContext.Products.FindAsync(id);
+            if (product == null) return 0;
+
+            _dbContext.Products.Remove(product);
+            return await _dbContext.SaveChangesAsync();
         }
     }
 }
