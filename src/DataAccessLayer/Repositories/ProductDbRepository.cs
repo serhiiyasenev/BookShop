@@ -29,10 +29,8 @@ namespace DataAccessLayer.Repositories
         {
             var query = _dbContext.Products.AsNoTracking();
             if (!string.IsNullOrEmpty(request.ItemName))
-            {
                 query = query.Where(item => item.Name.Contains(request.ItemName));
-            }
-            
+
             int totalCount = await query.CountAsync(cancellationToken);
             query = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize);
             return (query, totalCount);
