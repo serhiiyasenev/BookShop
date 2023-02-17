@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusinessLayer.Models.Inbound.Product
+namespace BusinessLayer.Models.Inbound
 {
     public class ProductInbound
     {
@@ -9,10 +9,10 @@ namespace BusinessLayer.Models.Inbound.Product
         [StringLength(100, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 100 characters")]
         public string Name { get; set; }
 
-        [StringLength(500, MinimumLength = 6, ErrorMessage = "Description must be between 6 and 500 characters")]
+        [StringLength(1000, MinimumLength = 6, ErrorMessage = "Description must be between 6 and 1000 characters")]
         public string Description { get; set; }
 
-        [StringLength(50, MinimumLength = 5, ErrorMessage = "Author must be between 5 and 100 characters")]
+        [StringLength(100, MinimumLength = 5, ErrorMessage = "Author must be between 5 and 100 characters")]
         public string Author { get; set; }
 
         [Required]

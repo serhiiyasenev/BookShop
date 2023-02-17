@@ -1,7 +1,8 @@
 ﻿using DataAccessLayer.DTO;
+using DataAccessLayer.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -15,15 +16,15 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Newly created Product
         /// </returns>
-        Task<ProductDto> Add(ProductDto product);
+        Task<ProductDto> Add(ProductDto product, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get all Products
+        /// Get all Products by predicate Items Request
         /// </summary>
         /// <returns>
         /// Products collection or empty collection
         /// </returns>
-        public IQueryable<ProductDto> GetAll();
+        Task<(IQueryable<ProductDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Product by id

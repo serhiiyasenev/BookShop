@@ -4,25 +4,33 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
-namespace BusinessLayer.Models.Inbound.Booking
+namespace BusinessLayer.Models.Inbound
 {
-    public abstract class BookingInboundBase<T>
+    public class BookingInbound
     {
         [Required]
-        [MinLength(6)]
-        [MaxLength(100)]
+        [StringLength(100, MinimumLength = 5, ErrorMessage = "Booking Name must be between 5 and 100 characters")]
+        public string Name { get; set; }
+
+        [Required]
+        [StringLength(200, MinimumLength = 6, ErrorMessage = "Delivery Addresse must be between 6 and 100 characters")]
         public string DeliveryAddress { get; set; }
 
         [Required]
         [EmailAddress]
+        [StringLength(128, MinimumLength = 6, ErrorMessage = "Customer Email must be between 6 and 100 characters")]
         public string CustomerEmail { get; set; }
 
+        [JsonIgnore]
         [ReadOnly(true)]
-        internal DateTime CreatedDate => DateTime.UtcNow;
+        public DateTime CreatedDate => DateTime.UtcNow;
 
+        [JsonIgnore]
         [ReadOnly(true)]
-        internal BookingStatus Status => BookingStatus.Submitted;
+        public BookingStatus Status => BookingStatus.Submitted;
 
         private DateOnly _deliveryDate;
 
@@ -43,7 +51,9 @@ namespace BusinessLayer.Models.Inbound.Booking
             }
         }
 
+        [Required]
+        [MinLength(1, ErrorMessage = "At least one product")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
-        public abstract IEnumerable<T> Products { get; set; }
+        public IEnumerable<Guid> Products { get; set; }
     }
 }

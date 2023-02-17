@@ -1,7 +1,6 @@
-﻿using Api.Helpers;
-using BusinessLayer.Interfaces;
+﻿using BusinessLayer.Interfaces;
+using BusinessLayer.Models.Files;
 using BusinessLayer.Models.Inbound;
-using BusinessLayer.Models.Inbound.Product;
 using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -19,24 +19,25 @@ namespace Api.Controllers
     [Produces("application/json")]
     public class ProductController : ControllerBase
     {
-        private readonly ImageStorageSettings _settings;
-        private readonly HttpContext _httpContext;
+        private readonly IProductService _productService;
         private readonly ILogger<ProductController> _logger;
-        private readonly IProductService<ProductInbound, ProductOutbound> _productService;
+        private readonly AllowedExtensions _allowedExtensions;
+        private readonly IFileUploadService _fileUploadService;
 
-        public ProductController(ILogger<ProductController> logger, IOptions<ImageStorageSettings> settings,
-            IProductService<ProductInbound, ProductOutbound> productService, IHttpContextAccessor contextAccessor)
+        public ProductController(ILogger<ProductController> logger, IProductService productService,
+            IOptions<AllowedExtensions> options, IFileUploadService fileUploadService)
         {
             _logger = logger;
-            _settings = settings.Value;
             _productService = productService;
-            _httpContext = contextAccessor.HttpContext;
+            _allowedExtensions = options.Value;
+            _fileUploadService = fileUploadService;
         }
 
         /// <summary>
         /// Create Product
         /// </summary>
         /// <param name="product"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>A newly created Product item</returns>
         /// <remarks>
         /// Sample request:
@@ -52,12 +53,15 @@ namespace Api.Controllers
         /// </remarks>
         /// <response code="201">Returns the newly created item</response>
         /// <response code="400">If the item is incorrect</response>
+        /// <remarks>
+        /// The return newly created Product
+        /// </remarks>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(ProductOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
-        public async Task<IActionResult> AddProduct(ProductInbound product)
+        public async Task<IActionResult> AddProduct(ProductInbound product, CancellationToken cancellationToken = default)
         {
-            var createdProduct = await _productService.AddItem(product);
+            var createdProduct = await _productService.AddItem(product, cancellationToken);
             _logger.LogInformation($"Product was created with id: '{createdProduct.Id}'");
             return CreatedAtAction(nameof(AddProduct), createdProduct);
         }
@@ -66,9 +70,12 @@ namespace Api.Controllers
         /// Upload image file to local or cloud storage
         /// </summary>
         /// <param name="image"></param>
-        /// <response code="200">Returns successfully saved message</response>
+        /// <response code="200">Returns uploaded file path</response>
         /// <response code="400">If the item is incorrect</response>
         /// <response code="500">If internal server error</response>
+        /// <remarks>
+        /// The return Simple Result message
+        /// </remarks>
         [HttpPost]
         [Route("Image")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
@@ -76,53 +83,50 @@ namespace Api.Controllers
         [ProducesResponseType(500, Type = typeof(SimpleResult))]
         public async Task<IActionResult> AddProductImage(IFormFile image)
         {
-            string fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant().Replace(".", "");
-            if (!_settings.AllowedExtensions.Split(";").ToList().Contains(fileExtension))
-            {
-                return BadRequest(new SimpleResult { Result = $"Not Allowed Extension `{fileExtension}`, extension should be from `{_settings.AllowedExtensions}`" });
-            }
+            var filName = image.FileName;
+            var validationResult = ValidateFileExtension(filName, _allowedExtensions.ImageAllowed);
+            if (validationResult != null) return validationResult;
 
-            var imagePath = Path.Combine(_settings.StoragePath, image.FileName);
-            var (saved, message) = await _productService.SaveImage(imagePath, image.OpenReadStream());
-            if (saved)
+            var result = await _fileUploadService.UploadFile(filName, image.OpenReadStream());
+
+            if (result.IsSaved)
             {
-                _logger.LogInformation($"Image `{image.FileName}` saved to Image Storage `{_settings.StoragePath}`'");
-                return Ok(new SimpleResult { Result = $"Image `{image.FileName}` successfully saved to Image Storage" });
+                _logger.LogInformation($"Image '{filName}' saved to Image Storage by path '{result.Message}'");
+                return Ok(new SimpleResult { Result = result.Message });
             }
             else
             {
-                _logger.LogInformation($"Image `{image.FileName}` cannot be saved to Image Storage `{_settings.StoragePath}` due to `{message}`'");
-                return StatusCode(500, new SimpleResult { Result = $"Image `{image.FileName}`cannot be saved to Image Storage now. {message}" });
+                _logger.LogInformation($"Image '{filName}' wasn't saved to Image Storage due to '{result.Message}'");
+                return StatusCode(500, new SimpleResult { Result = $"Failed to save image '{filName}' to Image Storage now." });
             }
         }
 
         /// <summary>
-        /// Get all Products endpoint
+        /// Get all Products
         /// </summary>
         /// <remarks>
-        /// The endpoint returns all Products from a storage
+        /// The returns all Products from a storage
         /// </remarks>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(ResponseModel<ProductOutbound>))]
-        public ActionResult<ResponseModel<ProductOutbound>> GetAllProducts([FromQuery] GetItemsRequest request)
+        public async Task<IActionResult> GetAllProducts([FromQuery] RequestModel request, CancellationToken cancellationToken = default)
         {
-            var requestTest = request;
-            var contextTest = _httpContext;
-            // it will be updated to get results via predicates From Query string and Context
-            var products = _productService.GetAllItems();
+            var products = await _productService.GetAll(request, cancellationToken);
             var result = new ResponseModel<ProductOutbound>
             {
-                Items = products,
-                TotalCount = products.Count()
+                Items = products.FilteredItems,
+                TotalCount = products.TotalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
             };
             return Ok(result);
         }
 
         /// <summary>
-        /// Get Product by id endpoint
+        /// Get Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns pointed by it's Guid Product from a storage
+        /// The returns pointed by it's Guid Product from a storage
         /// </remarks>
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(ProductOutbound))]
@@ -134,10 +138,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Update Product by id endpoint
+        /// Update Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns newly updated Product by Guid
+        /// The returns newly updated Product by Guid
         /// </remarks>
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(ProductOutbound))]
@@ -149,10 +153,10 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Delete Product by id endpoint
+        /// Delete Product by id
         /// </summary>
         /// <remarks>
-        /// The endpoint returns pointed Guid
+        /// The return Simple Result message
         /// </remarks>
         [HttpDelete("{id}")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
@@ -162,6 +166,19 @@ namespace Api.Controllers
             var result = await _productService.RemoveItemById(id);
             return result > 0 ? Ok(new SimpleResult { Result = $"Product with id '{id}' was deleted" }) 
                               : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+        }
+
+        private IActionResult ValidateFileExtension(string filName, string allowedExtensions)
+        {
+            string fileExtension = Path.GetExtension(filName).ToLowerInvariant();
+
+            if (!allowedExtensions.Split(";").ToList().Contains(fileExtension))
+            {
+                var result = new SimpleResult { Result = $"Not Allowed '{filName}', extension should be from '{allowedExtensions}'" };
+                return BadRequest(result);
+            }
+
+            return null;
         }
     }
 }

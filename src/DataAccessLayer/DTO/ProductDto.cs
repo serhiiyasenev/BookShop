@@ -8,17 +8,17 @@ namespace DataAccessLayer.DTO
     public class ProductDto
     {
         [Key]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 100 characters")]
+        [MaxLength(100)]
         public string Name { get; set; }
 
-        [StringLength(500, MinimumLength = 10, ErrorMessage = "Description must be between 10 and 500 characters")]
+        [MaxLength(1000)]
         public string Description { get; set; }
 
-        [StringLength(50, MinimumLength = 5, ErrorMessage = "Author must be between 5 and 100 characters")]
+        [MaxLength(100)]
         public string Author { get; set; }
 
         [Required]
@@ -26,9 +26,7 @@ namespace DataAccessLayer.DTO
         [Range(0, float.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
         public float Price { get; set; }
 
-        [DataType(DataType.ImageUrl)]
-        [Url(ErrorMessage = "Image URL must be a valid URL")]
-        [StringLength(1000, MinimumLength = 10, ErrorMessage = "URL Length must be between 10 and 100 characters")]
+        [MaxLength(1000)]
         public string ImageUrl { get; set; }
 
         [ForeignKey("BookingDto")]

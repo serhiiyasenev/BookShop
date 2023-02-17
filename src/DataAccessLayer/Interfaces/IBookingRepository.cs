@@ -1,7 +1,8 @@
 ﻿using DataAccessLayer.DTO;
+using DataAccessLayer.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLayer.Interfaces
@@ -15,24 +16,15 @@ namespace DataAccessLayer.Interfaces
         /// <returns>
         /// Newly created Booking
         /// </returns>
-        Task<BookingDto> Add(BookingDto booking);
+        Task<BookingDto> Add(BookingDto booking, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Add Booking with existing Products
-        /// </summary>
-        /// <param name="booking"></param>
-        /// <returns>
-        /// Newly created Booking
-        /// </returns>
-        Task<BookingDto> AddWithExistingProducts(BookingDto booking, IEnumerable<Guid> ids);
-
-        /// <summary>
-        /// Get all Bookings
+        /// Get all Bookings by predicate Items Request
         /// </summary>
         /// <returns>
         /// Bookings collection or empty collection
         /// </returns>
-        IQueryable<BookingDto> GetAll();
+        Task<(IQueryable<BookingDto> FilteredItems, int TotalCount)> GetAll(ItemsRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Booking by id
@@ -44,14 +36,13 @@ namespace DataAccessLayer.Interfaces
         Task<BookingDto> GetById(Guid id);
 
         /// <summary>
-        /// Update Booking by id
+        /// Update existing Booking
         /// </summary>
-        /// <param name="id"></param>
         /// <param name="booking"></param>
         /// <returns>
-        /// Updated Booking or null if Product was not found by id
+        /// Updated Booking
         /// </returns>
-        Task<BookingDto> UpdateById(Guid id, BookingDto booking);
+        Task<BookingDto> Update(BookingDto booking);
 
         /// <summary>
         /// Update Booking status by id

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BusinessLayer.Models.Inbound
+namespace DataAccessLayer.Models
 {
-    public class GetItemsRequest
+    public class ItemsRequest
     {
         public string ItemName { get; set; }
 
         [Range(1, 100)]
-        public int PageSize { get; set; } = 10;
+        public int PageSize { get; set; }
 
         [Range(1, 10000)]
-        public int Page { get; set;} = 1;
+        public int PageNumber { get; set; }
     }
 }
