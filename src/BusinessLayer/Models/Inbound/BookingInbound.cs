@@ -51,6 +51,8 @@ namespace BusinessLayer.Models.Inbound
             }
         }
 
+        [Required]
+        [MinLength(1, ErrorMessage = "At least one product")]
         [MaxLength(100, ErrorMessage = "More than 100 Product are not allowed to add to one order")]
         public IEnumerable<Guid> Products { get; set; }
     }

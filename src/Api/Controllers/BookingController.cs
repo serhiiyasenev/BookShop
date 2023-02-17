@@ -84,21 +84,20 @@ namespace Api.Controllers
 
                 return CreatedAtAction(nameof(AddBooking), createdBooking);
             }
+            // it will be updated by adding centralized Exception handling
             catch (Exception ex)
             {
-                // it will be updated by adding centralized Exception handling
                 if (ex.Message.Contains("Not Found"))
                 {
                     return NotFound(new ProblemDetails { Title = "Not Found by id", Detail = ex.Message });
                 }
-                else if (ex.Message.Contains("already linked"))
+
+                if (ex.Message.Contains("already linked"))
                 {
                     return Conflict(new ProblemDetails { Title = "Product already linked", Detail = ex.Message });
                 }
-                else
-                {
-                    return StatusCode(500, new ProblemDetails {Title = "Server error", Detail = ex.Message });
-                }
+
+                return StatusCode(500, new ProblemDetails { Title = "Internal Server error", Detail = ex.Message });
             }
         }
 
