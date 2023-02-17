@@ -2,9 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <UserSecretsId>ecdbc774-b144-4ffd-9ff2-2a81085048c5</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <OutputType>WinExe</OutputType>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -3,13 +3,21 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Files;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace UnitTests.Controllers
@@ -153,7 +161,7 @@ namespace UnitTests.Controllers
 
             _loggerMock.Verify(x => x.Log(LogLevel.Information, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(expectedResult.Message)),
-                It.IsAny<Exception>(), It.Is<Func<It.IsAnyType, Exception?, string>>((f, e) => true)), invockedCount);
+                It.IsAny<Exception>(), It.Is<Func<It.IsAnyType, Exception, string>>((f, e) => true)), invockedCount);
         }
 
         [Test]
@@ -196,6 +204,64 @@ namespace UnitTests.Controllers
             Assert.AreEqual(responseBody.TotalCount, expectedModel.TotalCount);
             Assert.AreEqual(responseBody.Page, request.Page);
             Assert.AreEqual(responseBody.PageSize, request.PageSize);
+        }
+
+        [Test]
+        public async Task GetProductBy_Should_Return_NewlyCreatedProduct()
+        {
+            // Arrange
+            var expectedItem = new ProductOutbound
+            {
+                    Id = Guid.NewGuid(),
+                    Name = "Product 1",
+                    Author = "Author 1",
+                    Price = 12.5f,
+                    ImageUrl = "https://test.com",
+                    Description = "test description",
+                    BookingId = Guid.NewGuid()
+            };
+
+            _productServiceMock.Setup(x => x.GetItemById(expectedItem.Id))
+                 .ReturnsAsync(expectedItem);
+
+            // Act
+            var response = await _productController.GetProductById(expectedItem.Id);
+
+            // Assert
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<OkObjectResult>(response);
+
+            var result = (response as OkObjectResult)?.Value as ProductOutbound;
+            result.Should().BeEquivalentTo(expectedItem);
+        }
+
+        [Test]
+        public async Task GetProductByWrongId_Should_Return_NotFound()
+        {
+            // Arrange
+            var expectedItem = new ProductOutbound
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 1",
+                Author = "Author 1",
+                Price = 12.5f,
+                ImageUrl = "https://test.com",
+                Description = "test description",
+                BookingId = Guid.NewGuid()
+            };
+
+            _productServiceMock.Setup(x => x.GetItemById(expectedItem.Id))
+                 .ReturnsAsync(expectedItem);
+
+            // Act
+            var response = await _productController.GetProductById((Guid)expectedItem.BookingId);
+
+            // Assert
+            Assert.IsNotNull(response);
+            Assert.IsInstanceOf<NotFoundObjectResult>(response);
+
+            var result = (response as NotFoundObjectResult)?.Value as SimpleResult;
+            result.Result.Should().BeEquivalentTo($"NotFound by id: '{expectedItem.BookingId}'");
         }
     }
 }

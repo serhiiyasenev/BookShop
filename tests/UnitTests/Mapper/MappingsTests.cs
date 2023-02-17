@@ -8,6 +8,8 @@ using DataAccessLayer.Models;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTests.Mapper
 {
