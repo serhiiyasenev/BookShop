@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
+using BusinessLayer.Models.Outbound;
+using System.Linq;
 
 namespace WebUI.Controllers
 {
@@ -24,8 +26,9 @@ namespace WebUI.Controllers
         // GET: Products
         public async Task<IActionResult> Index(RequestModel requestModel)
         {
-            (System.Linq.IQueryable<BusinessLayer.Models.Outbound.ProductOutbound> FilteredItems, int TotalCount) products = await _productService.GetAll(requestModel);
-            return View(products);
+            var products = await _productService.GetAll(requestModel);
+            var result = (products.FilteredItems, products.TotalCount, requestModel);
+            return View(result);
         }
 
         // GET: Prodcuts/Details/{Guid}
