@@ -63,7 +63,8 @@ namespace WebUI
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
+            //TODO: get path from Configuration ??
             var pathString = "/ImageStorage";
             var path = Path.Combine(Directory.GetCurrentDirectory(), $"..{pathString}");
 
