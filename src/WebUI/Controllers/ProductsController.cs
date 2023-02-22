@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using BusinessLayer.Models.Outbound;
 using System.Linq;
+using WebUI.Models.Products;
 
 namespace WebUI.Controllers
 {
@@ -27,8 +28,13 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Index(RequestModel requestModel)
         {
             var products = await _productService.GetAll(requestModel);
-            var result = (products.FilteredItems, products.TotalCount, requestModel);
-            return View(result);
+            var model = new IndexModel
+            { 
+                FilteredItems = products.FilteredItems,
+                TotalCount = products.TotalCount,
+                RequestModel = requestModel
+            };
+            return View(model);
         }
 
         // GET: Prodcuts/Details/{Guid}

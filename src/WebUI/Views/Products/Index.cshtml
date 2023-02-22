@@ -1,4 +1,4 @@
-﻿@model (System.Linq.IQueryable<BusinessLayer.Models.Outbound.ProductOutbound> FilteredItems, int TotalCount, BusinessLayer.Models.Inbound.RequestModel RequestModel)
+﻿@model WebUI.Models.Products.IndexModel
 
 @{
     ViewData["Title"] = "Products";
@@ -6,9 +6,16 @@
 
 <h1>Products V1</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<form method="get">
+    <p>
+        <label for="pageSize">Items on page:</label>
+        <select asp-for="RequestModel.PageSize" asp-items="@Model.PageSizeSelectList"></select>
+
+        Search by name: <input type="text" name="RequestModel.Name" value="@Model.RequestModel.Name">
+        <input type="submit" value="Apply" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -69,7 +76,8 @@
 
                     for (int i = 1; i <= totalPages; i++)
                     {
-                        <li class="page-item @(i == currentPage ? "active" : "")"><a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.RequestModel.PageSize })">@i</a></li>
+                        <li class="page-item @(i == currentPage ? "active" : "")"><a class="page-link" 
+                            href="@Url.Action("Index", new { page = i, pageSize = Model.RequestModel.PageSize })">@i</a></li>
                     }
                 }
             </ul>
