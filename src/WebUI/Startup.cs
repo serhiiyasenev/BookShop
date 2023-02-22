@@ -72,7 +72,7 @@ namespace WebUI
             app.UseStaticFiles(new StaticFileOptions 
             {
                 FileProvider = new PhysicalFileProvider(path),
-                RequestPath = new PathString("/ImageStorage") 
+                RequestPath = new PathString(pathString) 
             });
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
