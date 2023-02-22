@@ -66,10 +66,19 @@ namespace WebUI
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             
+            var pathString = "/ImageStorage";
+            var path = Path.Combine(Directory.GetCurrentDirectory(), $"..{pathString}");
+
             app.UseStaticFiles(new StaticFileOptions 
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../ImageStorage")),
+                FileProvider = new PhysicalFileProvider(path),
                 RequestPath = new PathString("/ImageStorage") 
+            });
+
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions
+            {
+                FileProvider = new PhysicalFileProvider(path),
+                RequestPath = new PathString(pathString)
             });
 
             app.UseRouting();
