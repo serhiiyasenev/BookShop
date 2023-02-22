@@ -5,12 +5,17 @@ using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Repositories;
+using Humanizer.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.IO;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace WebUI
@@ -60,6 +65,12 @@ namespace WebUI
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
+            
+            app.UseStaticFiles(new StaticFileOptions 
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "../ImageStorage")),
+                RequestPath = new PathString("/ImageStorage") 
+            });
 
             app.UseRouting();
 
