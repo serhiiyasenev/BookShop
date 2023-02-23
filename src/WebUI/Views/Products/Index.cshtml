@@ -4,15 +4,20 @@
     ViewData["Title"] = "Products";
 }
 
-<h1>Products V1</h1>
+<h1 style="color: deepskyblue">Products</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 
 <form method="get">
     <p>
         <label for="pageSize">Items on page:</label>
         <select asp-for="RequestModel.PageSize" asp-items="@Model.PageSizeSelectList"></select>
 
-        Search by name: <input type="text" name="RequestModel.Name" value="@Model.RequestModel.Name">
-        <input type="submit" value="Apply" />
+        Search by name:
+        <input type="text" name="RequestModel.Name" value="@Model.RequestModel.Name">
+        <input type="submit" value="Apply">
     </p>
 </form>
 
