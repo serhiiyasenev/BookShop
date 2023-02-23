@@ -83,21 +83,24 @@ namespace WebUI.Controllers
         // POST: Products/Edit/{Guid}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ProductInbound productInbound)
+        public async Task<IActionResult> Edit(Guid id, ProductOutbound productToUpdate)
         {
             var product = await _productService.GetItemById(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
+            if (!ModelState.IsValid) return View(productToUpdate);
 
-            if (ModelState.IsValid)
+            var productInbound = new ProductInbound
             {
-                var updatedProduct = await _productService.UpdateItemById(id, productInbound);
-                return RedirectToAction(nameof(Index));
-            }
+                Name = productToUpdate.Name,
+                Description = productToUpdate.Description,
+                Author = productToUpdate.Author,
+                Price = productToUpdate.Price,
+                ImageUrl = productToUpdate.ImageUrl
+            };
 
-            return View(productInbound);
+            var updatedProduct = await _productService.UpdateItemById(id, productInbound);
+
+            return View(updatedProduct);
         }
 
         // GET: Products/Delete/{Guid}
