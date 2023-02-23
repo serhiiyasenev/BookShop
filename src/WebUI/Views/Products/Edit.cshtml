@@ -6,6 +6,11 @@
 
 <h1 style="color: greenyellow">Edit Product</h1>
 
+@if (TempData["Success"] != null)
+{
+    <p class="alert alert-success" id="successMessage">@TempData["Success"]</p>
+}
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -45,6 +50,7 @@
 </div>
 
 <div>
+    <a asp-action="Details" asp-route-id="@Model.Id">Details</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 

@@ -6,10 +6,18 @@
 
 <h1 style="color: deepskyblue">Products</h1>
 
+<label>Total Count: @Model.TotalCount</label>
+
+@if (TempData["Created"] != null)
+{
+    <p class="alert alert-success" id="successMessage">@TempData["Created"]</p>
+}
+
 <div class="d-flex justify-content-between">
-    <div>
-        <p><a asp-action="Create">Create New</a></p>
-    </div>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+
     <form method="get">
         <div class="form-inline">
             <div class="form-group mr-2">

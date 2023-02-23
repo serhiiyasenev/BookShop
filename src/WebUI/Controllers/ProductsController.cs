@@ -66,6 +66,7 @@ namespace WebUI.Controllers
                 return View(productInbound);
             }
             var created = await _productService.AddItem(productInbound);
+            TempData["Created"] = "New product created!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -99,7 +100,7 @@ namespace WebUI.Controllers
             };
 
             var updatedProduct = await _productService.UpdateItemById(id, productInbound);
-
+            TempData["Success"] = "Updated successfully!";
             return View(updatedProduct);
         }
 
