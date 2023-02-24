@@ -61,10 +61,10 @@ namespace WebUI
                 //app.UseHsts(); ??
             }
 
-            //app.UseHttpsRedirection(); ??
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            //TODO: get path from Configuration ??
+            //TODO: get path from Configuration
             var pathString = "/ImageStorage";
             var path = Path.Combine(Directory.GetCurrentDirectory(), $"..{pathString}");
 
@@ -82,7 +82,7 @@ namespace WebUI
 
             app.UseRouting();
 			
-			//AddCors ??
+			//app.AddCors
 
             app.UseAuthorization();
 
