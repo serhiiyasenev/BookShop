@@ -114,7 +114,7 @@ namespace WebUI.Controllers
                 return NotFound();
             }
 
-            return View();
+            return View(result);
         }
 
         // POST: Products/Delete/5
@@ -123,6 +123,10 @@ namespace WebUI.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var result = await _productService.RemoveItemById(id);
+            if (result > 0)
+            {
+                TempData["Deleted"] = $"Product with id: '{id}' was deleted!";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

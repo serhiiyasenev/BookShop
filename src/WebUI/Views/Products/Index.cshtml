@@ -13,6 +13,11 @@
     <p class="alert alert-success" id="successMessage">@TempData["Created"]</p>
 }
 
+@if (TempData["Deleted"] != null)
+{
+    <p class="alert alert-info" id="successMessage">@TempData["Deleted"]</p>
+}
+
 <div class="d-flex justify-content-between">
     <p>
         <a asp-action="Create" class="btn btn-primary">Create New</a>
