@@ -1,12 +1,11 @@
 ﻿using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Files;
 using BusinessLayer.Models.Inbound;
+using BusinessLayer.Models.Outbound;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using BusinessLayer.Models.Outbound;
-using System.Linq;
 using WebUI.Models.Products;
 
 namespace WebUI.Controllers

@@ -17,6 +17,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Api\Api.csproj" />
+    <ProjectReference Include="..\..\src\WebUI\WebUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ImageStorage\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ImageStorage\NET-7-Revision-001.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -67,6 +67,8 @@ namespace WebUI
             //TODO: get path from Configuration
             var pathString = "/ImageStorage";
             var path = Path.Combine(Directory.GetCurrentDirectory(), $"..{pathString}");
+            var directoryExists = Directory.Exists(path);
+            if (!directoryExists) Directory.CreateDirectory(path);
 
             app.UseStaticFiles(new StaticFileOptions 
             {
