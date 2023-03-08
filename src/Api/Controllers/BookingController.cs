@@ -162,7 +162,7 @@ namespace Api.Controllers
         ///
         /// The returns newly updated Booking <br/>
         /// It will add new producs if you specified them in producs array <br/>
-        /// <b> If you need just update Booking without adding new products, skip `products []` here </b> <br/>
+        /// <b> If you need just update Booking without adding new products, leave `products []` empty here </b> <br/>
         /// (it will not remove previously added products)
         /// </remarks>
         /// <response code="200">Returns the newly updated item</response>
@@ -187,7 +187,7 @@ namespace Api.Controllers
         /// The returns newly updated Booking
         /// </remarks>
         [HttpPatch("{id}")]
-        [ProducesResponseType(200, Type = typeof(BookingOutbound))]
+        [ProducesResponseType(200, Type = typeof(SimpleResult))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
         public async Task<IActionResult> UpdateBookingStatusById(Guid id, BookingStatus bookingStatus)
         {
@@ -195,7 +195,9 @@ namespace Api.Controllers
             await _emailSender.SendEmailAsync(updatedBooking.CustomerEmail, 
                 "Your booking status was updated",
                 $"Your booking is: <br> <br> {updatedBooking}");
-            return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+            return updatedBooking != null 
+                ? Ok(new SimpleResult { Result = $"Status for booking with id: '{updatedBooking.Id}' was updated to: '{updatedBooking.Status}'" }) 
+                : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
     }
 }

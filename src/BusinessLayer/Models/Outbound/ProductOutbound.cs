@@ -7,6 +7,8 @@ namespace BusinessLayer.Models.Outbound
     {
         public Guid Id { get; set; }
 
+		[Required]
+        [StringLength(100, MinimumLength = 4, ErrorMessage = "Name must be between 4 and 100 characters")]
         public string Name { get; set; }
 
         public string Description { get; set; }
