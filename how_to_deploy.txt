@@ -1,1 +1,0 @@
-https://learn.microsoft.com/en-us/aspnet/core/tutorials/publish-to-azure-webapp-using-vs?view=aspnetcore-7.0#deploy-the-app-to-azure
