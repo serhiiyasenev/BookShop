@@ -38,7 +38,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<ProductDto> GetById(Guid id)
         {
-            return await _dbContext.Products.FindAsync(id);
+            return await _dbContext.Products.AsNoTracking().SingleOrDefaultAsync(e => e.Id.Equals(id));
         }
 
         public async Task<ProductDto> UpdateById(Guid id, ProductDto product)

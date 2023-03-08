@@ -1,0 +1,74 @@
+﻿@model BusinessLayer.Models.Outbound.ProductOutbound
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1 style="color: darkred">Delete Product</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Author)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Author)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.BookingId)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.BookingId)
+        </dd>
+    </dl>
+
+    <form id="delete-form" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="button" class="btn btn-danger" onclick="submitForm()">Delete</button>
+        <a asp-action="Index">Back to List</a>
+    </form>
+
+    <script>
+        function submitForm() {
+            if (confirm('Are you sure you want to delete this product?')) {
+                var form = document.getElementById('delete-form');
+                form.action = '@Url.Action("Delete", "Products")' + '?id=' +'@Model.Id';
+                form.method = 'post';
+                var methodInput = document.createElement('input');
+                methodInput.setAttribute('type', 'hidden');
+                methodInput.setAttribute('name', '_method');
+                methodInput.setAttribute('value', 'delete');
+                form.appendChild(methodInput);
+                form.submit();
+            }
+        }
+    </script>
+
+</div>
