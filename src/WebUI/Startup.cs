@@ -61,7 +61,7 @@ namespace WebUI
                 //app.UseHsts(); ??
             }
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             //TODO: get path from Configuration
