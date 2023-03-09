@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish src/WebUI -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: dotnet install ef
         run: dotnet tool install -g dotnet-ef
