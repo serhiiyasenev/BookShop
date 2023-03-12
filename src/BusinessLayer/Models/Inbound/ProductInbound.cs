@@ -21,7 +21,6 @@ namespace BusinessLayer.Models.Inbound
         public float Price { get; set; }
 
         [DataType(DataType.ImageUrl)]
-        //[Url(ErrorMessage = "Image URL must be a valid URL")]
         [StringLength(1000, MinimumLength = 6, ErrorMessage = "URL Length must be between 6 and 1000 characters")]
         public string ImageUrl { get; set; }
     }

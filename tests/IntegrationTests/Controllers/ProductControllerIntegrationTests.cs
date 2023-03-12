@@ -28,13 +28,12 @@ namespace IntegrationTests.Controllers
             _requestUri = "/product";
             _factory = new WebApplicationFactory<Startup>()
                 .WithWebHostBuilder(builder => 
-                builder.ConfigureServices(services =>
-                {
-                    services.RemoveAll(typeof(EfCoreContext));
-                    services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
-                    
-                    services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase("TestDb"));
-                }
+                    builder.ConfigureServices(services =>
+                    {
+                        services.RemoveAll(typeof(EfCoreContext));
+                        services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
+                        services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase("TestDb"));
+                    }
             ));
             _httpClient = _factory.CreateClient();
         }
