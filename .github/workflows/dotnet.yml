@@ -55,7 +55,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-          working-directory: ./coverage
+          working-directory: ${{env.DOTNET_ROOT}}/coverage
       
       - name: ReportGenerator
         uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
