@@ -192,12 +192,15 @@ namespace Api.Controllers
         public async Task<IActionResult> UpdateBookingStatusById(Guid id, BookingStatus bookingStatus)
         {
             var updatedBooking = await _bookingService.UpdateItemStatusById(id, bookingStatus);
+
+            if (updatedBooking == null) return NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+
             await _emailSender.SendEmailAsync(updatedBooking.CustomerEmail, 
                 "Your booking status was updated",
                 $"Your booking is: <br> <br> {updatedBooking}");
-            return updatedBooking != null 
-                ? Ok(new SimpleResult { Result = $"Status for booking with id: '{updatedBooking.Id}' was updated to: '{updatedBooking.Status}'" }) 
-                : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
+
+            return Ok(new SimpleResult { Result = $"Status for booking with id: " +
+                $"'{updatedBooking.Id}' was updated to: '{updatedBooking.Status}'" }) ;
         }
     }
 }
