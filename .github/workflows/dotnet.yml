@@ -36,7 +36,7 @@ jobs:
             -Dsonar.organization=serhiiyasenev
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory ${{env.DOTNET_ROOT}}/coverage
+        run: dotnet test --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
 
       - name: Upload artifact for next jobs
         uses: actions/upload-artifact@v2
