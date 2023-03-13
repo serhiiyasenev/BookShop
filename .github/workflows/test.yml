@@ -22,16 +22,6 @@ jobs:
       
     - name: Build
       run: dotnet build --no-restore --configuration Release
-
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args:             
-          -Dsonar.projectKey=serhiiyasenev_BookShop
-          -Dsonar.organization=serhiiyasenev
     
     - name: Test
       run: dotnet test --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage" --logger trx --results-directory coverage
