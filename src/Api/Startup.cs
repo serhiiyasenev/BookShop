@@ -78,6 +78,7 @@ namespace Api
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"));
 
+            app.UseHsts();
             app.UseHttpsRedirection();
 
             app.UseRouting();
