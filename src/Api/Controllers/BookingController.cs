@@ -23,7 +23,7 @@ namespace Api.Controllers
         private readonly ILogger<BookingController> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IProductService _productService;
-        private readonly IProductService _productService2;
+        private readonly IProductService _productService1;
         private readonly IBookingService _bookingService;
 
         public BookingController(ILogger<BookingController> logger, IHttpContextAccessor contextAccessor,
@@ -32,7 +32,7 @@ namespace Api.Controllers
             _logger = logger;
             _emailSender = emailSender;
             _productService = productService;
-            _productService2 = productService;
+            _productService1 = productService;
             _bookingService = bookingService;
             _httpContext = contextAccessor.HttpContext;
         }
