@@ -20,7 +20,7 @@ namespace DataAccessLayer
             // temp solution
             if (!optionsBuilder.IsConfigured)
             {
-                var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.Development.json").Build();
+                var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("settings.json").Build();
                 var connectionString = config.GetSection("ConnectionStrings").GetValue<string>("Default");
                 optionsBuilder.UseSqlServer(connectionString);
             }

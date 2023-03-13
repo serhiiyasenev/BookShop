@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish src/API -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish src/Api -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: dotnet install ef
         run: dotnet tool install -g dotnet-ef
@@ -45,7 +45,7 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}/swagger/index.html
 
     steps:
       - name: Download artifact from build job
@@ -57,7 +57,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'web-ui-serhii'
+          app-name: 'web-api-serhii'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_18218E72EECF457D9E94D60EBAF4F60E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC179C699F4149079ED43061F8D394E8 }}
           package: .
