@@ -22,8 +22,6 @@ namespace Api.Controllers
         private readonly HttpContext _httpContext;
         private readonly ILogger<BookingController> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly IProductService _productService;
-        private readonly IProductService _productService1;
         private readonly IBookingService _bookingService;
 
         public BookingController(ILogger<BookingController> logger, IHttpContextAccessor contextAccessor,
@@ -31,8 +29,6 @@ namespace Api.Controllers
         {
             _logger = logger;
             _emailSender = emailSender;
-            _productService = productService;
-            _productService1 = productService;
             _bookingService = bookingService;
             _httpContext = contextAccessor.HttpContext;
         }
@@ -77,12 +73,12 @@ namespace Api.Controllers
             {
                 var createdBooking = await _bookingService.AddItem(bookingInbound);
 
-                _logger.LogInformation($"Booking was created with id: '{createdBooking.Id}'");
+                _logger.LogInformation("Booking was created with id: '{BookingId}'", createdBooking.Id);
 
                 await _emailSender.SendEmailAsync(createdBooking.CustomerEmail, "Your booking was created",
                     $"<b> Congratulations! </b> <br> <br> Your booking is: <br> <br> {createdBooking}");
 
-                _logger.LogInformation($"Booking email was sent to `{createdBooking.CustomerEmail}`'");
+                _logger.LogInformation("Booking email was sent to '{Email}'", createdBooking.CustomerEmail);
 
                 return CreatedAtAction(nameof(AddBooking), createdBooking);
             }
