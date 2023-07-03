@@ -110,7 +110,7 @@ namespace Api.Controllers
         public async Task<ActionResult<ResponseModel<BookingOutbound>>> GetAllProducts([FromQuery] RequestModel request, CancellationToken cancellationToken = default)
         {
             var contextTest = _httpContext.User;
-            // it will be updated to get results due to Context
+            // it will be updated to get results due to UserContext
 
             var bookings = await _bookingService.GetAll(request, cancellationToken);
             var result = new ResponseModel<BookingOutbound>()
@@ -175,7 +175,7 @@ namespace Api.Controllers
         public async Task<IActionResult> UpdateBookingById(Guid id, BookingInbound bookingToUpdate)
         {
             var updatedBooking = await _bookingService.UpdateItemById(id, bookingToUpdate);
-            return Ok(updatedBooking);
+            return updatedBooking != null ? Ok(updatedBooking) : NotFound(new SimpleResult { Result = $"NotFound by id: '{id}'" });
         }
 
         /// <summary>

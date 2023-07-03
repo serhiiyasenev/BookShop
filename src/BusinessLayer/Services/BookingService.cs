@@ -66,10 +66,7 @@ namespace BusinessLayer.Services
         {
             var existingBooking = await _bookingRepository.GetById(id);
 
-            if (existingBooking == null)
-            {
-                throw new Exception(message: $"Booking Not Found by id: '{id}'");
-            }
+            if (existingBooking == null) return null;
 
             var linkedProducts = existingBooking.Products.ToList();
             if (bookingToUpdate.Products?.Count() > 0)

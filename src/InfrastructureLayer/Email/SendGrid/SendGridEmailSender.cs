@@ -19,7 +19,7 @@ namespace InfrastructureLayer.Email.SendGrid
         {
             _options = options.Value;
             _nameFrom = _options.SenderNameFrom;
-            _emailFrom = Environment.GetEnvironmentVariable(_options.SenderEmailFromKey);
+            _emailFrom = Environment.GetEnvironmentVariable(_options.SenderEmailFromKey) ?? "default@email.com";
             _client = new SendGridClient(Environment.GetEnvironmentVariable(_options.ApiKey));
         }
 
@@ -37,7 +37,6 @@ namespace InfrastructureLayer.Email.SendGrid
                 msg.AddTo(new EmailAddress(emailTo));
 
                 // disable tracking settings
-                // ref: https://sendgrid.com/docs/User_Guide/Settings/tracking.html
                 msg.SetClickTracking(false, false);
                 msg.SetOpenTracking(false);
                 msg.SetGoogleAnalytics(false);
