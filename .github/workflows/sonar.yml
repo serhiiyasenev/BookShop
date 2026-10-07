@@ -49,9 +49,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"serhiiyasenev_BookShop" /o:"serhiiyasenev" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"serhiiyasenev_BookShop" /o:"serhiiyasenev" /d:sonar.login="$env:SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet build
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
-
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="$env:SONAR_TOKEN"
