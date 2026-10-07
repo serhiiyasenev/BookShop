@@ -10,6 +10,8 @@ using BusinessLayer.Models.Outbound;
 using DataAccessLayer;
 using DataAccessLayer.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -60,6 +62,11 @@ namespace UnitTests
             Assert.That(price.ClrType, Is.EqualTo(typeof(decimal)));
             Assert.That(price.GetPrecision(), Is.EqualTo(18));
             Assert.That(price.GetScale(), Is.EqualTo(2));
+            var snapshotPrice = context.GetService<IMigrationsAssembly>().ModelSnapshot.Model
+                .FindEntityType(typeof(ProductDto).FullName).FindProperty(nameof(ProductDto.Price));
+            Assert.That(snapshotPrice.ClrType, Is.EqualTo(price.ClrType));
+            Assert.That(snapshotPrice.GetPrecision(), Is.EqualTo(price.GetPrecision()));
+            Assert.That(snapshotPrice.GetScale(), Is.EqualTo(price.GetScale()));
         }
     }
 }
