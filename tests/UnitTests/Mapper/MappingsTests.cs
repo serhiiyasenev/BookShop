@@ -49,7 +49,7 @@ namespace UnitTests.Mapper
                 Name = "Test",
                 Description = "Test Description",
                 Author = "Test Author",
-                Price = 10.12f,
+                Price = 10.12m,
                 ImageUrl = "http://example.com/image.jpg"
             };
 
@@ -76,7 +76,7 @@ namespace UnitTests.Mapper
                 Name = "Test",
                 Description = "Test Description",
                 Author = "Test Author",
-                Price = 10.01f,
+                Price = 10.01m,
                 ImageUrl = "http://example.com/image.jpg",
                 BookingDtoId = Guid.NewGuid()
             };
@@ -87,7 +87,7 @@ namespace UnitTests.Mapper
                 Name = "Test 2",
                 Description = "Test Description 2",
                 Author = "Test Author 2",
-                Price = 10.22f,
+                Price = 10.22m,
                 ImageUrl = "http://example.com/image2.jpg",
                 BookingDtoId = null
             };
@@ -155,7 +155,7 @@ namespace UnitTests.Mapper
                         Name = "Product 1",
                         Description = "Description 1",
                         Author = "Author 1",
-                        Price = 10.0f,
+                        Price = 10.0m,
                         ImageUrl = "http://example.com/image1.jpg",
                         BookingDtoId = testGuid
                     },
@@ -165,7 +165,7 @@ namespace UnitTests.Mapper
                         Name = "Product 2",
                         Description = "Description 2",
                         Author = "Author 2",
-                        Price = 15.0f,
+                        Price = 15.0m,
                         ImageUrl = "http://example.com/image2.jpg",
                         BookingDtoId = testGuid
                     }
@@ -189,7 +189,7 @@ namespace UnitTests.Mapper
                         Name = "Product 1",
                         Description = "Description 1",
                         Author = "Author 1",
-                        Price = 10.0f,
+                        Price = 10.0m,
                         ImageUrl = "http://example.com/image1.jpg",
                         BookingId = testGuid
                     },
@@ -199,7 +199,7 @@ namespace UnitTests.Mapper
                         Name = "Product 2",
                         Description = "Description 2",
                         Author = "Author 2",
-                        Price = 15.0f,
+                        Price = 15.0m,
                         ImageUrl = "http://example.com/image2.jpg",
                         BookingId = testGuid
                     }
@@ -214,3 +214,4 @@ namespace UnitTests.Mapper
         }
     }
 }
+

@@ -76,7 +76,7 @@ namespace UnitTests.Controllers
                 Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
                 Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
                 Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
+                Price = 12.56m,
                 ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
             };
 
@@ -174,10 +174,10 @@ namespace UnitTests.Controllers
             var expectedItems = new List<ProductOutbound>
             {
                 new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 1",
-                Author = "Author 1", Price = 12.5f, ImageUrl = "https://test.com" ,
+                Author = "Author 1", Price = 12.5m, ImageUrl = "https://test.com" ,
                 Description = "test description", BookingId = Guid.NewGuid() },
                 new ProductOutbound { Id = Guid.NewGuid(), Name = "Product 2",
-                Author = "Author 2", Price = 55.15f, ImageUrl = "ftp://test2.com" ,
+                Author = "Author 2", Price = 55.15m, ImageUrl = "ftp://test2.com" ,
                 Description = "test description 22", BookingId = null}
             }.AsQueryable();
 
@@ -215,7 +215,7 @@ namespace UnitTests.Controllers
                     Id = Guid.NewGuid(),
                     Name = "Product 1",
                     Author = "Author 1",
-                    Price = 12.5f,
+                    Price = 12.5m,
                     ImageUrl = "https://test.com",
                     Description = "test description",
                     BookingId = Guid.NewGuid()
@@ -244,7 +244,7 @@ namespace UnitTests.Controllers
                 Id = Guid.NewGuid(),
                 Name = "Product 1",
                 Author = "Author 1",
-                Price = 12.5f,
+                Price = 12.5m,
                 ImageUrl = "https://test.com",
                 Description = "test description",
                 BookingId = Guid.NewGuid()
@@ -265,3 +265,4 @@ namespace UnitTests.Controllers
         }
     }
 }
+

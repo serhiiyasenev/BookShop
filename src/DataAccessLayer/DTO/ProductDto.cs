@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,8 +24,11 @@ namespace DataAccessLayer.DTO
 
         [Required]
         [DataType(DataType.Currency)]
-        [Range(0, float.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
-        public float Price { get; set; }
+        [Range(typeof(decimal), "0", "9999999999999999.99",
+            ParseLimitsInInvariantCulture = true,
+            ErrorMessage = "Price must be between 0 and 9999999999999999.99")]
+        [Precision(18, 2)]
+        public decimal Price { get; set; }
 
         [MaxLength(1000)]
         public string ImageUrl { get; set; }
@@ -33,3 +37,4 @@ namespace DataAccessLayer.DTO
         public Guid? BookingDtoId { get; set; }
     }
 }
+
