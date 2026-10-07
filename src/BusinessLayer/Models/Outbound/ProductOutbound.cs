@@ -15,6 +15,10 @@ namespace BusinessLayer.Models.Outbound
 
         public string Author { get; set; }
 
+        [DataType(DataType.Currency)]
+        [Range(typeof(decimal), "0", "9999999999999999.99",
+            ParseLimitsInInvariantCulture = true,
+            ErrorMessage = "Price must be between 0 and 9999999999999999.99")]
         public decimal Price { get; set; }
 
         public string ImageUrl { get; set; }

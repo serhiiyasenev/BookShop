@@ -41,7 +41,7 @@ namespace UnitTests
             try
             {
                 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
-                foreach (var model in new object[] { new ProductInbound(), new ProductDto() })
+                foreach (var model in new object[] { new ProductInbound(), new ProductDto(), new ProductOutbound() })
                 {
                     var context = new ValidationContext(model) { MemberName = "Price" };
                     foreach (var value in new[] { 0m, 0.01m, 9999999999999999.99m })
