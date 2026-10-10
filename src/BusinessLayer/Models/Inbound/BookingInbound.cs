@@ -3,9 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 
 namespace BusinessLayer.Models.Inbound
 {
@@ -40,14 +38,11 @@ namespace BusinessLayer.Models.Inbound
             get => _deliveryDate;
             set
             {
-                if (!DateOnly.TryParse(value.ToString(CultureInfo.InvariantCulture), out _deliveryDate))
+                if (value < DateOnly.FromDateTime(CreatedDate))
                 {
-                    throw new ArgumentException($"Cannot parse DeliveryDate from `{value}`");
+                    throw new ArgumentException($"`DeliveryDate {value}` cannot be before `{CreatedDate}`");
                 }
-                if (_deliveryDate < DateOnly.FromDateTime(CreatedDate))
-                {
-                    throw new ArgumentException($"`DeliveryDate {_deliveryDate}`cannot be before `{CreatedDate}`");
-                }
+                _deliveryDate = value;
             }
         }
 
@@ -56,3 +51,4 @@ namespace BusinessLayer.Models.Inbound
         public IEnumerable<Guid> Products { get; set; }
     }
 }
+

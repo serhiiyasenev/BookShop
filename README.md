@@ -72,9 +72,11 @@ For the booking flow, configure the following environment variables in the API t
 
 | Variable | Purpose |
 |---|---|
-| `SendGridSettings__ApiKey` | SendGrid API credential |
-| `SendGridSettings__SenderEmailFromKey` | Verified sender email address |
+| `SEND_GRID_API_KEY` | SendGrid API credential |
+| `SEND_GRID_EMAIL_FROM` | Verified sender email address |
 | `SendGridSettings__SenderNameFrom` | Display name of the sender |
+
+The development configuration stores the **names** of the credential/sender environment variables in `SendGridSettings.ApiKey` and `SenderEmailFromKey`; the email sender resolves their values from the environment. Keep these option values as variable names if you override the configuration.
 
 Use `POST /Booking` in Swagger with a new booking name, an email you control, a delivery address, a delivery date of today or later, and the product ID in `products`. Read the booking back and try reserving the same product again to demonstrate the conflict response. Booking email is sent after persistence: an email failure can leave a saved booking even when the HTTP request returns an error. Check existing bookings before retrying.
 
@@ -96,7 +98,15 @@ A shared layered application is sufficient for this scope. It is straightforward
 dotnet test BookShop.sln --configuration Release
 ```
 
-Unit tests cover controllers and mappings. Existing HTTP/MVC integration tests use EF Core InMemory. Price regression tests check exact JSON/mapping round trips, validation under different cultures and the SQL Server model. CI also runs migration tests against a real SQL Server container. To run those locally, set `BOOKSHOP_TEST_SQLSERVER` to a local test-server connection with permission to create/drop temporary databases; otherwise those tests are explicitly skipped.
+Unit tests cover controllers, mappings, price/date validation, local file writes, and SendGrid message construction, tracking settings and provider/transport failures. SendGrid tests inject `ISendGridClient`; no real email or provider credentials are required.
+
+HTTP/MVC integration tests exercise catalog validation, booking creation/update/status, conflicts, pagination, rendered pages and deletion with antiforgery protection. The new scenario fixtures use a separate EF Core InMemory database per test and record outgoing email in memory. CI additionally verifies price migrations and the complete booking persistence flow against a real SQL Server container, including reusing existing products and saving newly added booking links. To run the SQL Server tests locally, set `BOOKSHOP_TEST_SQLSERVER` to a local test-server connection with permission to create/drop temporary databases; otherwise those tests are explicitly skipped.
+
+CI merges unit and integration coverage into the **CoverageReport** workflow artifact and posts a per-assembly table on the PR. The table's Health indicator is based on line coverage: below 50% is red, 50–74% is intermediate, and 75% or more is green. Branch coverage is reported separately; a green Health indicator does not mean every path is tested. To collect coverage locally:
+
+```bash
+dotnet test BookShop.sln --configuration Release --collect:"XPlat Code Coverage" --results-directory coverage
+```
 
 Migration `20261007090000_UseDecimalProductPrices` converts existing `real` prices to `decimal(18,2)`. It rejects negative/out-of-range legacy values and rounds representable values to two decimal places. Back up and review existing data before applying it. A rollback to `real` loses precision; it cannot recover the original values. JSON prices remain numeric. New and edited prices must be between `0` and `9999999999999999.99` and exactly representable with two decimal places. Fractional cents such as `0.001` or `19.499` are rejected before persistence (API: `400` with a `Price` validation error; MVC: a field error). Trailing zeros such as `19.4900` are accepted because the amount is exactly `19.49`. The service also enforces these rules for callers outside HTTP. No currency conversion is implemented.
 
