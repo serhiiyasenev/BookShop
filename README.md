@@ -66,7 +66,7 @@ Open [the product list](https://localhost:7247/Products). Both entry points use 
 2. Call `GET /Product/{id}` and confirm the returned price is `19.49`.
 3. Call `GET /Product?Name=Musketeers&Page=1&PageSize=10`, then find the same record in the MVC product list.
 4. Edit the price in the MVC form, reload the API record, and show that both views use the same storage.
-5. Submit a negative price to `POST /Product`; expect validation to reject it with `400`.
+5. Submit a negative price or a price with a fractional cent (such as `19.499`) to `POST /Product`; expect validation to reject it with `400`.
 
 For the booking flow, configure the following environment variables in the API terminal using your own SendGrid settings, then restart the API:
 
@@ -98,7 +98,7 @@ dotnet test BookShop.sln --configuration Release
 
 Unit tests cover controllers and mappings. Existing HTTP/MVC integration tests use EF Core InMemory. Price regression tests check exact JSON/mapping round trips, validation under different cultures and the SQL Server model. CI also runs migration tests against a real SQL Server container. To run those locally, set `BOOKSHOP_TEST_SQLSERVER` to a local test-server connection with permission to create/drop temporary databases; otherwise those tests are explicitly skipped.
 
-Migration `20261007090000_UseDecimalProductPrices` converts existing `real` prices to `decimal(18,2)`. It rejects negative/out-of-range legacy values and rounds representable values to two decimal places. Back up and review existing data before applying it. A rollback to `real` loses precision; it cannot recover the original values. JSON prices remain numeric. Supply prices in currency units with at most two decimal places; the SQL column rounds additional fractional digits. No currency conversion is implemented.
+Migration `20261007090000_UseDecimalProductPrices` converts existing `real` prices to `decimal(18,2)`. It rejects negative/out-of-range legacy values and rounds representable values to two decimal places. Back up and review existing data before applying it. A rollback to `real` loses precision; it cannot recover the original values. JSON prices remain numeric. New and edited prices must be between `0` and `9999999999999999.99` and exactly representable with two decimal places. Fractional cents such as `0.001` or `19.499` are rejected before persistence (API: `400` with a `Price` validation error; MVC: a field error). Trailing zeros such as `19.4900` are accepted because the amount is exactly `19.49`. The service also enforces these rules for callers outside HTTP. No currency conversion is implemented.
 
 ## Known limitations
 

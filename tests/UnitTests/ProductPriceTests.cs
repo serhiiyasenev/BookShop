@@ -7,11 +7,14 @@ using AutoMapper;
 using BusinessLayer.Mappings;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
+using BusinessLayer.Services;
 using DataAccessLayer;
 using DataAccessLayer.DTO;
+using DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Moq;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -51,6 +54,48 @@ namespace UnitTests
                 }
             }
             finally { CultureInfo.CurrentCulture = original; }
+        }
+
+        [TestCase("uk-UA")]
+        [TestCase("en-US")]
+        public void PriceValidation_RejectsFractionalCents_AndAcceptsTrailingZeros(string culture)
+        {
+            var original = CultureInfo.CurrentCulture;
+            try
+            {
+                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+                foreach (var model in new object[] { new ProductInbound(), new ProductOutbound() })
+                {
+                    var context = new ValidationContext(model) { MemberName = "Price" };
+                    foreach (var value in new[] { 0m, 0.0100m, 19.4900m, 1234567890.1200m, 9999999999999999.99m })
+                        Assert.That(Validator.TryValidateProperty(value, context, new List<ValidationResult>()),
+                            Is.True, $"{model.GetType().Name}: {value}");
+                    foreach (var value in new[] { 0.001m, 19.499m, 19.999m, 0.0000000000000000000000000001m })
+                    {
+                        var errors = new List<ValidationResult>();
+                        Assert.That(Validator.TryValidateProperty(value, context, errors),
+                            Is.False, $"{model.GetType().Name}: {value}");
+                        Assert.That(errors[0].ErrorMessage, Is.EqualTo("Price must have at most two decimal places."));
+                    }
+                }
+            }
+            finally { CultureInfo.CurrentCulture = original; }
+        }
+
+        [TestCase("0.001")]
+        [TestCase("19.499")]
+        [TestCase("-0.01")]
+        [TestCase("10000000000000000")]
+        public void Service_RejectsInvalidPrices_BeforeCallingRepository(string text)
+        {
+            var repository = new Mock<IProductRepository>(MockBehavior.Strict);
+            var mapper = new MapperConfiguration(c => c.AddProfile<BookingProfile>()).CreateMapper();
+            var service = new ProductService(mapper, repository.Object);
+            var product = new ProductInbound { Name = "Price validation book", Price = decimal.Parse(text, CultureInfo.InvariantCulture) };
+
+            Assert.ThrowsAsync<ValidationException>(() => service.AddItem(product));
+            Assert.ThrowsAsync<ValidationException>(() => service.UpdateItemById(Guid.NewGuid(), product));
+            repository.VerifyNoOtherCalls();
         }
 
         [Test]

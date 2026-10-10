@@ -6,6 +6,7 @@ using DataAccessLayer.DTO;
 using DataAccessLayer.Interfaces;
 using DataAccessLayer.Models;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace BusinessLayer.Services
 
         public async Task<ProductOutbound> AddItem(ProductInbound booking, CancellationToken cancellationToken = default)
         {
+            ValidatePrice(booking);
             var dbItem = await _productRepository.Add(_mapper.Map<ProductDto>(booking));
             return _mapper.Map<ProductOutbound>(dbItem);
         }
@@ -44,6 +46,7 @@ namespace BusinessLayer.Services
 
         public async Task<ProductOutbound> UpdateItemById(Guid id, ProductInbound booking)
         {
+            ValidatePrice(booking);
             var dbItem = await _productRepository.UpdateById(id, _mapper.Map<ProductDto>(booking));
             return _mapper.Map<ProductOutbound>(dbItem);
         }
@@ -52,5 +55,14 @@ namespace BusinessLayer.Services
         {
             return await _productRepository.RemoveItemById(id);
         }
+
+        private static void ValidatePrice(ProductInbound product)
+        {
+            Validator.ValidateProperty(product.Price, new ValidationContext(product)
+            {
+                MemberName = nameof(ProductInbound.Price)
+            });
+        }
     }
 }
+
