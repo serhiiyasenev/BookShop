@@ -102,7 +102,7 @@ namespace IntegrationTests.Controllers
             using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
             var id = Guid.NewGuid();
             if (edit) await SeedProduct(factory, id);
-            var path = edit ? $"/Products/Edit/{id}" : "/Products/Create";
+            var path = edit ? $"/Products/Edit?id={id}" : "/Products/Create";
             using var form = await PriceForm(client, path, id, text);
             using var response = await client.PostAsync(path, form);
 
@@ -124,7 +124,7 @@ namespace IntegrationTests.Controllers
             using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
             var id = Guid.NewGuid();
             if (edit) await SeedProduct(factory, id);
-            var path = edit ? $"/Products/Edit/{id}" : "/Products/Create";
+            var path = edit ? $"/Products/Edit?id={id}" : "/Products/Create";
             using var form = await PriceForm(client, path, id, "19.4900");
             using var response = await client.PostAsync(path, form);
 
