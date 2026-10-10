@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using BusinessLayer.Validation;
 
 namespace BusinessLayer.Models.Inbound
 {
@@ -17,11 +18,15 @@ namespace BusinessLayer.Models.Inbound
 
         [Required]
         [DataType(DataType.Currency)]
-        [Range(0, float.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
-        public float Price { get; set; }
+        [Range(typeof(decimal), "0", "9999999999999999.99",
+            ParseLimitsInInvariantCulture = true,
+            ErrorMessage = "Price must be between 0 and 9999999999999999.99")]
+        [PriceScale]
+        public decimal Price { get; set; }
 
         [DataType(DataType.ImageUrl)]
         [StringLength(1000, MinimumLength = 6, ErrorMessage = "URL Length must be between 6 and 1000 characters")]
         public string ImageUrl { get; set; }
     }
 }
+

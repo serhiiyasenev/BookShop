@@ -17,6 +17,8 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BookingDto> Add(BookingDto booking, CancellationToken cancellationToken = default)
         {
+            // These catalog products already exist; only the booking is new.
+            _dbContext.Products.AttachRange(booking.Products);
             var bookingEntity = await _dbContext.Bookings.AddAsync(booking, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return bookingEntity.Entity;
@@ -43,6 +45,10 @@ namespace DataAccessLayer.Repositories
         {
             _dbContext.Attach(bookingUpdate);
             _dbContext.Entry(bookingUpdate).State = EntityState.Modified;
+            // The service sets links on detached products before Attach, so EF cannot
+            // detect those changes. Persist only the FK, not unrelated catalog fields.
+            foreach (var product in bookingUpdate.Products)
+                _dbContext.Entry(product).Property(p => p.BookingDtoId).IsModified = true;
             await _dbContext.SaveChangesAsync();
             return bookingUpdate;
         }
@@ -60,3 +66,4 @@ namespace DataAccessLayer.Repositories
         }
     }
 }
+

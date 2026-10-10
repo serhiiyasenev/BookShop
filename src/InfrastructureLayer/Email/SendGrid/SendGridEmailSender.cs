@@ -12,15 +12,19 @@ namespace InfrastructureLayer.Email.SendGrid
     {
         private readonly string _emailFrom;
         private readonly string _nameFrom;
-        private readonly SendGridSettings _options;
-        private readonly SendGridClient _client;
+        private readonly ISendGridClient _client;
 
         public SendGridEmailSender(IOptions<SendGridSettings> options)
+            : this(options, new SendGridClient(Environment.GetEnvironmentVariable(options.Value.ApiKey)))
         {
-            _options = options.Value;
-            _nameFrom = _options.SenderNameFrom;
-            _emailFrom = Environment.GetEnvironmentVariable(_options.SenderEmailFromKey) ?? "default@email.com";
-            _client = new SendGridClient(Environment.GetEnvironmentVariable(_options.ApiKey));
+        }
+
+        public SendGridEmailSender(IOptions<SendGridSettings> options, ISendGridClient client)
+        {
+            var settings = options.Value;
+            _nameFrom = settings.SenderNameFrom;
+            _emailFrom = Environment.GetEnvironmentVariable(settings.SenderEmailFromKey) ?? "default@email.com";
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         public async Task<(bool, string)> SendEmailAsync(string emailTo, string subject, string message)
@@ -59,3 +63,4 @@ namespace InfrastructureLayer.Email.SendGrid
         }
     }
 }
+

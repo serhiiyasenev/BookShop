@@ -47,7 +47,7 @@ namespace IntegrationTests.Controllers
                 Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
                 Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
                 Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
+                Price = 12.56m,
                 ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
             };
 
@@ -78,7 +78,7 @@ namespace IntegrationTests.Controllers
                 Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
                 Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
                 Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
+                Price = 12.56m,
                 ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
             };
 
@@ -113,7 +113,7 @@ namespace IntegrationTests.Controllers
                 Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
                 Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
                 Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
+                Price = 12.56m,
                 ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
             };
 
@@ -140,7 +140,7 @@ namespace IntegrationTests.Controllers
                 Name = $"The Three Musketeers {DateTime.UtcNow.Ticks}",
                 Description = $"You have likely heard of The Three Musketeers! {DateTime.UtcNow.Ticks}",
                 Author = $"Alexandre Dumas {DateTime.UtcNow.Ticks}",
-                Price = 12.56f,
+                Price = 12.56m,
                 ImageUrl = $"ftp://book.shop/{DateTime.UtcNow.Ticks}/image.jpg"
             };
 
@@ -166,3 +166,4 @@ namespace IntegrationTests.Controllers
         }
     }
 }
+
