@@ -6,7 +6,7 @@ A book catalog and reservation application with an ASP.NET Core API and an MVC i
 
 **Project status:** portfolio application built on .NET 7. The repository contains working application code and automated tests; it is not a complete commercial storefront. There is no payment processing or inventory quantity model.
 
-## What you can demonstrate
+## Demo
 
 | Scenario | What to show |
 |---|---|
