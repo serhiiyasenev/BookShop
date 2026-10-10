@@ -61,7 +61,7 @@ Open [the product list](https://localhost:7247/Products). Both entry points use 
    }
    ```
 
-   The image URL is a placeholder; an image download is not needed for this demo. Expect `201` and copy the returned `id`.
+   The image URL is a placeholder; you don't need to download an image for this demo. Expect `201` and copy the returned `id`.
 2. Call `GET /Product/{id}` and confirm the returned price is `19.49`.
 3. Call `GET /Product?Name=Musketeers&Page=1&PageSize=10`, then find the same record in the MVC product list.
 4. Edit the price in the MVC form, reload the API record, and show that both views use the same storage.
@@ -89,7 +89,7 @@ Use `POST /Booking` in Swagger with a new booking name, an email you control, a 
 | `src/DataAccessLayer` | EF Core repositories, SQL Server model and migrations | Centralizes persistence and schema evolution |
 | `src/InfrastructureLayer` | SendGrid integration | Isolates the external email provider |
 
-A shared layered application is sufficient for this scope. It is straightforward to debug and test, at the cost of both hosts being coupled to the same model and database. Separate API and MVC hosts are alternative entry points, not independently owned microservices.
+A shared layered application is sufficient for this scope. It is straightforward to debug and test, but it couples both hosts to the same model and database. Separate API and MVC hosts are alternative entry points, not independently owned microservices.
 
 ## Tests and price migration
 
@@ -116,5 +116,3 @@ dotnet test BookShop.sln --configuration Release --collect:"XPlat Code Coverage"
 - Image upload uses local storage and additional `AllowedExtensions`/`ImageStorageSettings` configuration; the catalog demo above uses a URL only.
 - The MVC interface focuses on products; demonstrate bookings through Swagger.
 - CI includes a SonarCloud integration that requires a valid `SONAR_TOKEN` with analysis permission for this project.
-
-[`BookShop-2`](https://github.com/serhiiyasenev/BookShop-2) is a related variant, not a separate portfolio case. This repository is the featured version.
