@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Enums;
+﻿using Api.Security;
+using BusinessLayer.Enums;
 using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [ApiController]
+    [RequireAdminApiKey]
     [Route("[controller]")]
     [Produces("application/json")]
     public class BookingController : ControllerBase

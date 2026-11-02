@@ -5,6 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Api.Helpers;
+using Api.Security;
+using IntegrationTests.Helpers;
+using Microsoft.Extensions.Configuration;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer;
@@ -29,6 +32,7 @@ namespace IntegrationTests.Controllers
         {
             using var factory = CreateFactory<Api.Startup>();
             using var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add(AdminApiKeyAuthorizationFilter.HeaderName, BookShopTestFactory<Api.Startup>.TestAdminKey);
             using var content = JsonHelper.ToStringContent(Product(decimal.Parse(text, CultureInfo.InvariantCulture)));
             using var response = await client.PostAsync("/Product", content);
 
@@ -45,6 +49,7 @@ namespace IntegrationTests.Controllers
         {
             using var factory = CreateFactory<Api.Startup>();
             using var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add(AdminApiKeyAuthorizationFilter.HeaderName, BookShopTestFactory<Api.Startup>.TestAdminKey);
             using var createContent = JsonHelper.ToStringContent(Product(12.34m));
             using var createdResponse = await client.PostAsync("/Product", createContent);
             var created = await createdResponse.EnsureSuccessStatusCode().GetModelAsync<ProductOutbound>();
@@ -68,6 +73,7 @@ namespace IntegrationTests.Controllers
             var price = decimal.Parse(text, CultureInfo.InvariantCulture);
             using var factory = CreateFactory<Api.Startup>();
             using var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add(AdminApiKeyAuthorizationFilter.HeaderName, BookShopTestFactory<Api.Startup>.TestAdminKey);
             using var createContent = JsonHelper.ToStringContent(Product(price));
             using var createdResponse = await client.PostAsync("/Product", createContent);
             var created = await createdResponse.EnsureSuccessStatusCode().GetModelAsync<ProductOutbound>();
@@ -139,12 +145,21 @@ namespace IntegrationTests.Controllers
         {
             var databaseName = "PriceValidation_" + Guid.NewGuid().ToString("N");
             return new WebApplicationFactory<TStartup>().WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, configuration) =>
+                {
+                    configuration.AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        ["Security:AdminApiKey"] = BookShopTestFactory<Api.Startup>.TestAdminKey
+                    });
+                });
                 builder.ConfigureServices(services =>
                 {
                     services.RemoveAll(typeof(EfCoreContext));
                     services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
                     services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase(databaseName));
-                }));
+                });
+            });
         }
 
         private static ProductInbound Product(decimal price) => new ProductInbound

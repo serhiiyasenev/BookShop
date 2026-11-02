@@ -37,6 +37,8 @@ dotnet tool install --tool-path ./.tools dotnet-ef --version 7.0.3
 dotnet run --project src/Api --launch-profile BookShopAPI
 ```
 
+Before using Swagger to create products or bookings, configure a strong administrator key (at least 32 UTF-8 bytes) as `Security__AdminApiKey` in the API process environment or in protected Azure App Service settings. Restart the API, open Swagger, select **Authorize**, and enter that same key for the `X-Admin-Api-Key` header. The key must never be committed, logged, or placed in publicly shipped browser code. Product listing and details remain public; product writes and all booking endpoints require this header. Without a configured server key those protected endpoints return 503, while requests with missing or incorrect header return 401. This shared key is temporary until proper user identities and role-based authorization are implemented.
+
 Open [Swagger](https://localhost:5001/swagger). On supported platforms, `dotnet dev-certs https --trust` trusts the certificate locally. Otherwise, follow your platform's development-certificate setup.
 
 To run the MVC catalog, open a second terminal, set the same `ConnectionStrings__Default`, then:

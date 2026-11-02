@@ -30,7 +30,7 @@ namespace IntegrationTests.Controllers
         public void SetUp()
         {
             _factory = new BookShopTestFactory<Api.Startup>();
-            _client = _factory.CreateClient();
+            _client = _factory.CreateAuthorizedClient();
         }
 
         [TearDown]
