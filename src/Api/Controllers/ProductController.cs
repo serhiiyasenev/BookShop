@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Interfaces;
+﻿using Api.Security;
+using BusinessLayer.Interfaces;
 using BusinessLayer.Models.Files;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
@@ -56,6 +57,7 @@ namespace Api.Controllers
         /// <remarks>
         /// The return newly created Product
         /// </remarks>
+        [RequireAdminApiKey]
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(ProductOutbound))]
         [ProducesResponseType(400, Type = typeof(ProblemDetails))]
@@ -76,6 +78,7 @@ namespace Api.Controllers
         /// <remarks>
         /// The return Simple Result message
         /// </remarks>
+        [RequireAdminApiKey]
         [HttpPost]
         [Route("Image")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
@@ -143,6 +146,7 @@ namespace Api.Controllers
         /// <remarks>
         /// The returns newly updated Product by Guid
         /// </remarks>
+        [RequireAdminApiKey]
         [HttpPut("{id}")]
         [ProducesResponseType(200, Type = typeof(ProductOutbound))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
@@ -158,6 +162,7 @@ namespace Api.Controllers
         /// <remarks>
         /// The return Simple Result message
         /// </remarks>
+        [RequireAdminApiKey]
         [HttpDelete("{id}")]
         [ProducesResponseType(200, Type = typeof(SimpleResult))]
         [ProducesResponseType(404, Type = typeof(SimpleResult))]
