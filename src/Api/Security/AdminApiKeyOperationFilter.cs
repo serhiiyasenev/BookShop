@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -12,7 +11,7 @@ namespace Api.Security
         {
             var method = context.MethodInfo;
             var protectedMethod = method.IsDefined(typeof(RequireAdminApiKeyAttribute), true)
-                || (method.DeclaringType?.IsDefined(typeof(RequireAdminApiKeyAttribute), true) ?? false);
+                || (method.DeclaringType!.IsDefined(typeof(RequireAdminApiKeyAttribute), true));
             if (!protectedMethod) return;
 
             operation.Security ??= new List<OpenApiSecurityRequirement>();
