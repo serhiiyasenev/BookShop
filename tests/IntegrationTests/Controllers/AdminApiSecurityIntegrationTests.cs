@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -7,6 +9,8 @@ using System.Threading.Tasks;
 using Api.Security;
 using BusinessLayer.Models.Inbound;
 using IntegrationTests.Helpers;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using NUnit.Framework;
 
 namespace IntegrationTests.Controllers
@@ -68,6 +72,59 @@ namespace IntegrationTests.Controllers
             Assert.That(paths.GetProperty("/Product").GetProperty("post").TryGetProperty("security", out _), Is.True);
             Assert.That(paths.GetProperty("/Product").GetProperty("get").TryGetProperty("security", out _), Is.False);
             Assert.That(paths.GetProperty("/Booking").GetProperty("get").TryGetProperty("security", out _), Is.True);
+        }
+    }
+
+
+    public class AdminApiOperationFilterUnitTests
+    {
+        private sealed class PlainController
+        {
+            public void PublicAction() { }
+
+            [RequireAdminApiKey]
+            public void RestrictedAction() { }
+        }
+
+        [RequireAdminApiKey]
+        private sealed class RestrictedController
+        {
+            public void RestrictedAction() { }
+        }
+
+        private static OperationFilterContext ContextFor(Type controller, string action)
+        {
+            var method = controller.GetMethod(action, BindingFlags.Public | BindingFlags.Instance);
+            return new OperationFilterContext(null, null, null, method);
+        }
+
+        [Test]
+        public void Apply_DoesNotRequireKeyForUnprotectedAction()
+        {
+            var operation = new OpenApiOperation();
+            new AdminApiKeyOperationFilter().Apply(operation, ContextFor(typeof(PlainController), nameof(PlainController.PublicAction)));
+            Assert.That(operation.Security, Is.Null.Or.Empty);
+        }
+
+        [Test]
+        public void Apply_InitializesMissingSecurityForMethodAttribute()
+        {
+            var operation = new OpenApiOperation { Security = null };
+            new AdminApiKeyOperationFilter().Apply(operation, ContextFor(typeof(PlainController), nameof(PlainController.RestrictedAction)));
+            Assert.That(operation.Security, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void Apply_PreservesExistingSecurityForControllerAttribute()
+        {
+            var original = new OpenApiSecurityRequirement();
+            var operation = new OpenApiOperation
+            {
+                Security = new List<OpenApiSecurityRequirement> { original }
+            };
+            new AdminApiKeyOperationFilter().Apply(operation, ContextFor(typeof(RestrictedController), nameof(RestrictedController.RestrictedAction)));
+            Assert.That(operation.Security, Has.Count.EqualTo(2));
+            Assert.That(operation.Security[0], Is.SameAs(original));
         }
     }
 }
