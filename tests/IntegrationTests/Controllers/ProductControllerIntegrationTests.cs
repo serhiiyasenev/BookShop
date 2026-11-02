@@ -3,6 +3,7 @@ using Api.Helpers;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
 using DataAccessLayer;
+using IntegrationTests.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -21,21 +22,13 @@ namespace IntegrationTests.Controllers
     {
         private readonly string _requestUri;
         private readonly HttpClient _httpClient;
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly BookShopTestFactory<Startup> _factory;
 
         public ProductControllerIntegrationTests()
         {
             _requestUri = "/product";
-            _factory = new WebApplicationFactory<Startup>()
-                .WithWebHostBuilder(builder => 
-                    builder.ConfigureServices(services =>
-                    {
-                        services.RemoveAll(typeof(EfCoreContext));
-                        services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
-                        services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase("TestDb"));
-                    }
-            ));
-            _httpClient = _factory.CreateClient();
+            _factory = new BookShopTestFactory<Startup>();
+            _httpClient = _factory.CreateAuthorizedClient();
         }
 
         [Test]
