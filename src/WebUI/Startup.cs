@@ -44,7 +44,7 @@ namespace WebUI
 
             services.AddControllersWithViews();
 
-            services.AddAutoMapper(new[] { Assembly.GetAssembly(typeof(BookingProfile)) });
+            services.AddAutoMapper(_ => { }, typeof(BookingProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

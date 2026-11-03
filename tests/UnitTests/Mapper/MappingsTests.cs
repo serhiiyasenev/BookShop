@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using BusinessLayer.Enums;
 using BusinessLayer.Mappings;
 using BusinessLayer.Models.Inbound;
@@ -20,7 +21,7 @@ namespace UnitTests.Mapper
 
         public BookingProfileTests()
         {
-            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<BookingProfile>());
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<BookingProfile>(), NullLoggerFactory.Instance);
             _mapper = new AutoMapper.Mapper(configuration);
             _mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }

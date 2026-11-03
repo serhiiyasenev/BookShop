@@ -53,7 +53,7 @@ namespace Api
             services.Configure<ImageStorageSettings>(Configuration.GetSection(nameof(ImageStorageSettings)));
             services.Configure<SendGridSettings>(Configuration.GetSection(nameof(SendGridSettings)));
 
-            services.AddAutoMapper(new[] { Assembly.GetAssembly(typeof(BookingProfile)) });
+            services.AddAutoMapper(_ => { }, typeof(BookingProfile));
 
             services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

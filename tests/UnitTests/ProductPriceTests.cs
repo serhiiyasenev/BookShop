@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json;
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using BusinessLayer.Mappings;
 using BusinessLayer.Models.Inbound;
 using BusinessLayer.Models.Outbound;
@@ -28,7 +29,7 @@ namespace UnitTests
         public void Price_SurvivesJsonAndMappings_WithoutLosingCents(string text)
         {
             var inbound = JsonSerializer.Deserialize<ProductInbound>("{\"Price\":" + text + "}");
-            var mapper = new MapperConfiguration(c => c.AddProfile<BookingProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(c => c.AddProfile<BookingProfile>(), NullLoggerFactory.Instance).CreateMapper();
             var entity = mapper.Map<ProductDto>(inbound);
             var outbound = mapper.Map<ProductOutbound>(entity);
             var roundTrip = JsonSerializer.Deserialize<ProductOutbound>(JsonSerializer.Serialize(outbound));
@@ -89,7 +90,7 @@ namespace UnitTests
         public void Service_RejectsInvalidPrices_BeforeCallingRepository(string text)
         {
             var repository = new Mock<IProductRepository>(MockBehavior.Strict);
-            var mapper = new MapperConfiguration(c => c.AddProfile<BookingProfile>()).CreateMapper();
+            var mapper = new MapperConfiguration(c => c.AddProfile<BookingProfile>(), NullLoggerFactory.Instance).CreateMapper();
             var service = new ProductService(mapper, repository.Object);
             var product = new ProductInbound { Name = "Price validation book", Price = decimal.Parse(text, CultureInfo.InvariantCulture) };
 
