@@ -9,6 +9,7 @@ using InfrastructureLayer.Email.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -46,6 +47,7 @@ namespace IntegrationTests.Helpers
             {
                 services.RemoveAll<EfCoreContext>();
                 services.RemoveAll<DbContextOptions<EfCoreContext>>();
+                services.RemoveAll<IDbContextOptionsConfiguration<EfCoreContext>>();
                 services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase(_databaseName));
                 services.RemoveAll<IEmailSender>();
                 services.AddSingleton<IEmailSender>(Email);
