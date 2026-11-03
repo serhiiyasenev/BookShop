@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using BusinessLayer.Enums;
 using BusinessLayer.Mappings;
 using BusinessLayer.Models.Inbound;
@@ -37,7 +38,7 @@ namespace IntegrationTests
                 var additional = new ProductDto { Id = Guid.NewGuid(), Name = "Additional book", Price = 12.34m };
                 setup.Products.AddRange(original, additional);
                 await setup.SaveChangesAsync();
-                var mapper = new MapperConfiguration(cfg => cfg.AddProfile<BookingProfile>()).CreateMapper();
+                var mapper = new MapperConfiguration(cfg => cfg.AddProfile<BookingProfile>(), NullLoggerFactory.Instance).CreateMapper();
                 Guid bookingId;
                 DateTime createdDate;
 
