@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NUnit.Framework;
@@ -29,6 +30,7 @@ namespace IntegrationTests.Controllers
                     {
                         services.RemoveAll(typeof(EfCoreContext));
                         services.RemoveAll(typeof(DbContextOptions<EfCoreContext>));
+                        services.RemoveAll(typeof(IDbContextOptionsConfiguration<EfCoreContext>));
                         services.AddDbContext<EfCoreContext>(options => options.UseInMemoryDatabase("TestDb"));
                     }
             ));
