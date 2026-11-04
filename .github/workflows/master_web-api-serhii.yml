@@ -35,7 +35,7 @@ jobs:
         run: dotnet ef migrations bundle -p src/DataAccessLayer/DataAccessLayer.csproj -o ${{env.DOTNET_ROOT}}/myapp/migrate
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
